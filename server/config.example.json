@@ -9,15 +9,32 @@
     "SYSTEM": {
         "GET_DATA_TIMEOUT": 2500
     },
-    "LOGIN_ELEMENT_SELECTOR": {
-        "FIELD_USERNAME": "input[name=username]",
-        "FIELD_PASSWORD": "input[name=password]",
-        "BUTTON_LOGIN": ".login-view__login"
+    "NINEGAG": {
+        "DOMAIN": "https://9gag.com",
+        "LOGIN_DOMAIN": "https://9gag.com/login",
+        "POST_DOMAIN": "https://9gag.com/gag/"
     },
-    "POST_ELEMENT_SELECTOR": {
-        "AUTHOR_AVATAR": ".post-view-header__icon .icon",
-        "AUTHOR_NAME": ".post-view-header__author",
-        "POST_TITLE": "header h1",
-        "POST_BODY": ".post-view"
+    "PUPPETEER": {
+        "HEADLESS": {
+            "WINDOW": {
+                "WIDTH": 1920,
+                "HEIGHT": 1080
+            },
+            "USER_AGENT": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/61.0.3163.100 Safari/537.36",
+            "DEFAULT_NAVIGATION_TIMEOUT": 0
+        }
+    },
+    "SELECTORS": {
+        "LOGIN": {
+            "FIELD_USERNAME": "input[name=username]",
+            "FIELD_PASSWORD": "input[name=password]",
+            "BUTTON_LOGIN": ".login-view__login"
+        },
+        "POST": {
+            "AUTHOR_AVATAR": ".post-view-header__icon .icon",
+            "AUTHOR_NAME": ".post-view-header__author",
+            "POST_TITLE": "header h1",
+            "POST_BODY": ".post-view"
+        }
     }
 }
