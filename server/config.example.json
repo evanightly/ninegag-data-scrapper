@@ -1,0 +1,23 @@
+{
+    "USER_CREDENTIALS": {
+        "USERNAME_OR_EMAIL": "",
+        "PASSWORD": ""
+    },
+    "MONGODB_CREDENTIALS": {
+        "DB_URI": "mongodb+srv:"
+    },
+    "SYSTEM": {
+        "GET_DATA_TIMEOUT": 2500
+    },
+    "LOGIN_ELEMENT_SELECTOR": {
+        "FIELD_USERNAME": "input[name=username]",
+        "FIELD_PASSWORD": "input[name=password]",
+        "BUTTON_LOGIN": ".login-view__login"
+    },
+    "POST_ELEMENT_SELECTOR": {
+        "AUTHOR_AVATAR": ".post-view-header__icon .icon",
+        "AUTHOR_NAME": ".post-view-header__author",
+        "POST_TITLE": "header h1",
+        "POST_BODY": ".post-view"
+    }
+}

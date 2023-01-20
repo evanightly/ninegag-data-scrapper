@@ -1,0 +1,5 @@
+{
+    "SERVER_ORIGIN": "http://localhost:1122",
+    "DISPLAY_TAG_LIMIT": 5,
+    "DEFAULT_MEDIA_VOLUME": 0.5
+}

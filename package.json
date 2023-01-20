@@ -1,0 +1,15 @@
+{
+  "name": "nine-saved-posts",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "install:client": "npm install --prefix ./client",
+    "install:server": "npm install --prefix ./server",
+    "install": "npm run install:all -prefix ./server",
+    "start": "npm run dev --prefix ./server"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}
