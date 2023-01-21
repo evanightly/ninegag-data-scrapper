@@ -1,4 +1,4 @@
-import { useEffect, useContext, useMemo } from "react";
+import { useContext, useMemo } from "react";
 import { ThemeContext } from "../App"
 import { Badge, Card } from 'react-bootstrap'
 import axios from 'axios'
@@ -6,8 +6,6 @@ import config from '../config'
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry"
 
 const Post = ({ post }) => {
-    const { state } = useContext(ThemeContext)
-
     const Media = useMemo(() => {
         const { mediaType, mediaSources } = post
         return (
@@ -52,7 +50,7 @@ const Post = ({ post }) => {
                 </Card.Footer>
             </Card>
         )
-    }, [state.posts])
+    }, [Media, post.dateCreated, post.tags, post.title])
 
     return post.title && PostBody
 }
@@ -66,7 +64,7 @@ export default function Posts() {
         axios
             .get(`${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`)
             .then(({ data: posts }) => {
-                axios.get(SERVER_ORIGIN + '/post/total/' + state.postType).then(({data: postTotal}) => {
+                axios.get(SERVER_ORIGIN + '/post/total/' + state.postType).then(({ data: postTotal }) => {
                     postTotal = Math.ceil(postTotal / state.postLimit)
                     dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postTotal } })
                 })

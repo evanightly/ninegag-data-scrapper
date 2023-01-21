@@ -1,10 +1,9 @@
 import { Container, Form, InputGroup, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { ThemeContext } from "../App";
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useCallback } from "react";
 import $ from 'jquery'
 import axios from "axios";
 import config from '../config'
-import { useCallback } from "react";
 export default function PostsNavigation() {
     const { ACTIONS, state, dispatch } = useContext(ThemeContext)
 
@@ -37,13 +36,23 @@ export default function PostsNavigation() {
                     {alert("Search result more than 100 posts, please try to be more specific, or check the console for the results")}
                 </>
             )
-            : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: '' } })
-
+            : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: '', searchMode: true } })
     }, [ACTIONS, dispatch, state.postSearch])
 
     const handleChangeSearch = useCallback(e => {
         dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: e.target.value } })
     }, [ACTIONS, dispatch])
+
+    const handleReset = () => {
+        if (state.searchMode) {
+            const { SERVER_ORIGIN } = config
+            axios
+                .get(`${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`)
+                .then(({ data: posts }) => {
+                    dispatch({ type: ACTIONS.SET_REDUCER, payload: { searchMode: false, posts } })
+                })
+        }
+    }
 
     useEffect(() => {
         state.darkMode
@@ -65,7 +74,7 @@ export default function PostsNavigation() {
                 fluid
                 className="justify-content-between">
 
-                <Navbar.Brand>NineSystem</Navbar.Brand>
+                <Navbar.Brand onClick={handleReset} role="button">NineSystem</Navbar.Brand>
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
                 <Navbar.Collapse className="w-0" id="basic-navbar-nav">
                     <Form onSubmit={handleSubmit} className="w-100">
@@ -76,6 +85,7 @@ export default function PostsNavigation() {
                                 aria-describedby="basic-addon1"
                                 style={{ borderTopLeftRadius: "50px", borderBottomLeftRadius: "50px", border: "none" }}
                                 value={state.postSearch}
+                                required
                                 onChange={handleChangeSearch}
                             />
 
