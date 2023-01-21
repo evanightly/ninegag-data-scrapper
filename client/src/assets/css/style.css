@@ -1,127 +1,29 @@
 :root {
-  --primaryColor: #e91e63;
+  --danger: #e91e63;
   --darkColor: #121212;
-  --darkSubtleColor: #242627;
+  --darkColor-2: #242627;
+  --darkColor-3: #212529;
   --lightColor: #fff;
-  --darkTextColor: #212529;
+}
+
+.bg-danger {
+  background-color: var(--danger) !important;
+}
+
+nav .navbar-brand,
+nav .nav-link {
+  color: var(--lightColor);
 }
 
 body.darkMode {
-  background: var(--darkColor);
+  background-color: var(--darkColor);
 }
 
-body.darkMode .bg-primary {
-  background: var(--primaryColor) !important;
-}
-
-body.darkMode .text-primary {
-  color: var(--primaryColor) !important;
-}
-
-body.darkMode h1,
-body.darkMode h2,
-body.darkMode h3,
-body.darkMode h4,
-body.darkMode h5,
-body.darkMode h6,
-body.darkMode label {
-  color: var(--lightColor);
-}
-
-body.darkMode .modal-content {
-  background-color: var(--darkSubtleColor);
-}
-
-body.darkMode .modal-content button.btn-outline-primary {
-  border-color: var(--primaryColor);
-  color: var(--primaryColor);
-}
-
-body.darkMode .modal-content button.btn-outline-primary:hover {
-  background-color: var(--lightColor) !important;
-}
-
-body.darkMode .card h5,
-body.darkMode .card a,
-body.darkMode .card a:hover,
-body.darkMode .card a:active {
-  color: var(--primaryColor);
+body.darkMode .pagination .page-item {
+  color: var(--danger) !important;
 }
 
 body.darkMode .card {
-  background-color: var(--darkSubtleColor);
+  background-color: var(--darkColor-2);
   color: var(--lightColor);
-}
-
-body.darkMode .card .card-body span.tag-icon {
-  background-color: var(--primaryColor);
-}
-
-body.darkMode nav.navbar {
-  background-color: var(--primaryColor);
-}
-
-body.darkMode .page-item .page-link {
-  color: var(--primaryColor);
-}
-
-body.darkMode table tr * {
-  color: var(--lightColor);
-}
-
-body.darkMode table tr:hover * {
-  color: var(--primaryColor);
-}
-
-#backToTop {
-  right: 5%;
-  bottom: 15%;
-}
-
-#backToTop button {
-  border-radius: 50% !important;
-}
-
-.card img.author {
-  height: 2rem;
-  width: 2rem;
-  border-radius: 50px;
-}
-
-.card button.new-tag-popup {
-  z-index: 5;
-}
-
-.card .form {
-  top: -3rem;
-  left: 0;
-  z-index: 4;
-}
-
-.tag-icon {
-  width: 2rem;
-  height: 2rem;
-}
-
-.tag-list {
-  z-index: 3;
-  top: 0;
-  left: 0;
-  padding: 0.5rem 1.2rem;
-}
-
-.card input[name="tag-icon"]:checked~.tag-list {
-  display: flex !important;
-}
-
-.card input[name="tag-icon"]~label span {
-  border: 2px solid transparent;
-}
-
-.card input[name="tag-icon"]:checked~label span {
-  border: 2px solid #29ab87;
-}
-
-.card:hover .tag-list {
-  display: flex !important;
 }

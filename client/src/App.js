@@ -1,7 +1,5 @@
 import React, { useReducer, createContext } from "react";
 import Index from "./pages/Index";
-import Authors from "./pages/Authors";
-import Navigation from "./components/Navigation";
 import {
   BrowserRouter as Router,
   Routes,
@@ -13,20 +11,17 @@ export const ThemeContext = createContext()
 export default function App() {
   const initialState = {
     page: 1,
-    chunk: 5, // used as limit document
+    darkMode: true,
+    postLimit: 10,
     postTotal: 0,
     postType: 1, // 1 means saved, 2 means voted
-    searchType: 'title',
-    search: '',
-    darkMode: true,
-    tags: [],
+    postSearch: '',
+    postTags: [],
     posts: [],
-    authors: [],
-    toasts: []
   }
 
   const ACTIONS = {
-    SET_REDUCER: 'setReducer'
+    SET_REDUCER: 'SET_REDUCER'
   }
 
   const reducer = (state, action) => {
@@ -42,12 +37,10 @@ export default function App() {
   const [state, dispatch] = useReducer(reducer, initialState)
 
   return (
-    <ThemeContext.Provider value={{ state, ACTIONS, dispatch }}>
+    <ThemeContext.Provider value={{ ACTIONS, state, dispatch }}>
       <Router>
-        <Navigation />
         <Routes>
           <Route exact path="/" element={<Index />} />
-          <Route path="/authors" element={<Authors />} />
         </Routes>
       </Router>
     </ThemeContext.Provider>
