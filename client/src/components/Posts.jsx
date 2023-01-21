@@ -27,14 +27,14 @@ const Post = ({ post }) => {
                 style={{ width: 300 }}>
                 {Media}
                 <Card.Body>
-                    <Card.Title>{post.title}</Card.Title>
+                    <Card.Title as="a" href={`https://9gag.com/gag/${post.id}`} target="_blank"  className="h5 text-decoration-none text-light">{post.title}</Card.Title>
                     <Card.Text>
                         {post.tags.map((tag, index) => (
                             <Badge
                                 key={index}
                                 pill
                                 bg="primary"
-                                className="me-1 text-capitalize">
+                                className="me-1 text-capitalize mt-2">
                                 {tag.title}
                             </Badge>
                         ))}
@@ -51,7 +51,7 @@ const Post = ({ post }) => {
                 </Card.Footer>
             </Card>
         )
-    }, [Media, post.dateCreated, post.tags, post.title])
+    }, [Media, post.dateCreated, post.id, post.tags, post.title])
 
     return post.title && PostBody
 }

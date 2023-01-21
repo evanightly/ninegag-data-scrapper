@@ -88,10 +88,21 @@ export default function PostsNavigation() {
                 fluid
                 className="justify-content-between">
 
-                <Navbar.Brand onClick={handleReset} role="button">NineSystem</Navbar.Brand>
+                <Navbar.Brand
+                    onClick={handleReset}
+                    role="button">NineSystem
+                </Navbar.Brand>
+
                 <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse className="w-0" id="basic-navbar-nav">
-                    <Form onSubmit={handleSubmit} className="w-100">
+
+                <Navbar.Collapse
+                    className="w-0"
+                    id="basic-navbar-nav">
+
+                    <Form
+                        onSubmit={handleSubmit}
+                        className="w-100">
+                            
                         <InputGroup className="w-25 mx-auto">
                             <Form.Control
                                 placeholder="Search"
