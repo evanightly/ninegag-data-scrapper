@@ -14,7 +14,9 @@ export default function PostsNavigation() {
 
     const handleChangePostLimit = async (e) => {
         const postLimit = parseInt(e.target.value)
-        let { data: postTotal } = await axios.get(config.SERVER_ORIGIN + '/post/total/' + state.postType)
+        let { data: postTotal } = await axios
+            .get(config.SERVER_ORIGIN + '/post/total/' + state.postType)
+
         postTotal = Math.ceil(postTotal / postLimit)
         dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
     }
@@ -25,13 +27,17 @@ export default function PostsNavigation() {
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
+        const { data: posts } = await axios
+            .get(config.SERVER_ORIGIN + '/post/search', { params: { searchQuery: state.postSearch } })
 
-        const { data: posts } = await axios.get(config.SERVER_ORIGIN + '/post/search', { params: { searchQuery: state.postSearch } })
-        if (posts.length > 100) {
-            alert("Search result more than 100 posts, please try to be more specific")
-        } else {
-            dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: '' } })
-        }
+        posts.length > 100
+            ? (
+                <>
+                    {console.log(posts)}
+                    {alert("Search result more than 100 posts, please try to be more specific, or check the console for the results")}
+                </>
+            )
+            : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: '' } })
 
     }, [ACTIONS, dispatch, state.postSearch])
 
@@ -40,12 +46,14 @@ export default function PostsNavigation() {
     }, [ACTIONS, dispatch])
 
     useEffect(() => {
-        if (state.darkMode) {
-            $('body').addClass('darkMode')
-        } else {
-            $('body').removeClass('darkMode')
-        }
+        state.darkMode
+            ? $('body').addClass('darkMode')
+            : $('body').removeClass('darkMode')
     }, [state.darkMode])
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [state.page])
 
     return (
         <Navbar
@@ -82,18 +90,25 @@ export default function PostsNavigation() {
                         </InputGroup>
                     </Form>
                     <Nav className="ms-auto">
-                        <NavDropdown title="Post Limits" id="basic-nav-dropdown" focusFirstItemOnShow>
-                            <NavDropdown.Item className="p-0 px-1" as="span">
-                                <Form.Range
-                                    step={10}
-                                    max={100}
-                                    min={10}
-                                    value={state.postLimit}
-                                    onChange={handleChangePostLimit} />
+                        <NavDropdown title={<i className="bi bi-infinity"></i>} id="basic-nav-dropdown" focusFirstItemOnShow>
+                            <NavDropdown.Item className="p-0 px-1 d-flex flex-column" as="span">
+                                <Form.Label htmlFor="changePostLimit" children={<p className="text-center m-0">Post Limits</p>} />
+                                <Container fluid className="d-flex p-0 align-items-center">
+                                    <p className="m-0">10</p>
+                                    <Form.Range
+                                        id="changePostLimit"
+                                        step={10}
+                                        max={100}
+                                        min={10}
+                                        value={state.postLimit}
+                                        className="mx-2"
+                                        onChange={handleChangePostLimit} />
+                                    <p className="m-0">100</p>
+                                </Container>
 
                             </NavDropdown.Item>
                         </NavDropdown>
-                        <NavDropdown title="Settings" id="basic-nav-dropdown">
+                        <NavDropdown title={<i className="bi bi-gear"></i>} id="basic-nav-dropdown">
                             <NavDropdown.Item onClick={handleChangeDarkMode}>
                                 {state.darkMode
                                     ? <div className="text-warning">

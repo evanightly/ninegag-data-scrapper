@@ -19,11 +19,21 @@ body.darkMode {
   background-color: var(--darkColor);
 }
 
-body.darkMode .pagination .page-item {
-  color: var(--danger) !important;
+body.darkMode .pagination .page-item:not(.disabled) .page-link {
+  color: var(--danger);
+}
+
+body.darkMode .pagination .page-item.active .page-link {
+  background-color: var(--danger) !important;
+  border-color: var(--danger);
+  color: var(--lightColor);
 }
 
 body.darkMode .card {
   background-color: var(--darkColor-2);
   color: var(--lightColor);
+}
+
+body.darkMode .footer.bg-primary {
+  background-color: var(--danger) !important;
 }

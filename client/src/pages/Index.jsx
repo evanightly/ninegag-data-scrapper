@@ -2,6 +2,7 @@ import { Stack } from "react-bootstrap"
 import Posts from "../components/Posts"
 import PostsNavigation from "../components/PostsNavigation"
 import PostsPagination from "../components/PostsPagination"
+import Footer from "../components/Footer"
 export default function Index() {
 
     return (
@@ -9,6 +10,8 @@ export default function Index() {
             <PostsNavigation />
             <PostsPagination />
             <Posts />
+            <PostsPagination />
+            <Footer />
         </Stack>
     )
 
