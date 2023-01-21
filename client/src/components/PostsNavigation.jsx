@@ -1,28 +1,13 @@
-import { Container, Form, InputGroup, Nav, NavDropdown, Navbar } from "react-bootstrap";
+import { Button, ButtonGroup, Container, Form, InputGroup, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { ThemeContext } from "../App";
-import { useContext, useEffect, useCallback } from "react";
+import { useContext, useEffect, useCallback, useState } from "react";
 import $ from 'jquery'
 import axios from "axios";
 import config from '../config'
 export default function PostsNavigation() {
     const { ACTIONS, state, dispatch } = useContext(ThemeContext)
 
-    const handleChangePostType = (postType) => {
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType } })
-    }
-
-    const handleChangePostLimit = async (e) => {
-        const postLimit = parseInt(e.target.value)
-        let { data: postTotal } = await axios
-            .get(config.SERVER_ORIGIN + '/post/total/' + state.postType)
-
-        postTotal = Math.ceil(postTotal / postLimit)
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
-    }
-
-    const handleChangeDarkMode = () => {
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { darkMode: !state.darkMode } })
-    }
+    const [showModal, setShowModal] = useState(false)
 
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
@@ -43,6 +28,23 @@ export default function PostsNavigation() {
         dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: e.target.value } })
     }, [ACTIONS, dispatch])
 
+    const handleChangePostType = (postType) => {
+        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType } })
+    }
+
+    const handleChangePostLimit = async (e) => {
+        const postLimit = parseInt(e.target.value)
+        let { data: postTotal } = await axios
+            .get(config.SERVER_ORIGIN + '/post/total/' + state.postType)
+
+        postTotal = Math.ceil(postTotal / postLimit)
+        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
+    }
+
+    const handleChangeDarkMode = () => {
+        dispatch({ type: ACTIONS.SET_REDUCER, payload: { darkMode: !state.darkMode } })
+    }
+
     const handleReset = () => {
         if (state.searchMode) {
             const { SERVER_ORIGIN } = config
@@ -54,6 +56,12 @@ export default function PostsNavigation() {
         }
     }
 
+    const handleSelectedTag = async (_id) => {
+        const { data: posts } = await axios.get(config.SERVER_ORIGIN + '/tag/' + _id)
+        dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, searchMode: true } })
+        setShowModal(false)
+    }
+
     useEffect(() => {
         state.darkMode
             ? $('body').addClass('darkMode')
@@ -63,6 +71,12 @@ export default function PostsNavigation() {
     useEffect(() => {
         window.scrollTo(0, 0)
     }, [state.page])
+
+    useEffect(() => {
+        axios
+            .get(config.SERVER_ORIGIN + '/tag')
+            .then(({ data: postTags }) => dispatch({ type: ACTIONS.SET_REDUCER, payload: { postTags } }))
+    }, [ACTIONS.SET_REDUCER, dispatch])
 
     return (
         <Navbar
@@ -99,11 +113,57 @@ export default function PostsNavigation() {
 
                         </InputGroup>
                     </Form>
+
                     <Nav className="ms-auto">
-                        <NavDropdown title={<i className="bi bi-infinity"></i>} id="basic-nav-dropdown" focusFirstItemOnShow>
-                            <NavDropdown.Item className="p-0 px-1 d-flex flex-column" as="span">
-                                <Form.Label htmlFor="changePostLimit" children={<p className="text-center m-0">Post Limits</p>} />
-                                <Container fluid className="d-flex p-0 align-items-center">
+                        <Nav.Link role="button" onClick={() => setShowModal(true)}><i className="bi bi-tags"></i></Nav.Link>
+
+                        <Modal className="tag-modal" fullscreen show={showModal} onHide={() => setShowModal(false)}>
+                            {state.darkMode ?
+                                <Modal.Header closeButton closeVariant="white">
+                                    <Modal.Title>Tags</Modal.Title>
+                                </Modal.Header>
+                                :
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Tags</Modal.Title>
+                                </Modal.Header>
+                            }
+
+                            <Modal.Body className=" d-flex flex-wrap gap-2">
+                                {state.postTags.map((tag, index) => (
+                                    <ButtonGroup key={index}>
+                                        <Button
+                                            variant={tag.tagType === "Custom" ? "warning" : "primary"}
+                                            onClick={() => handleSelectedTag(tag._id)}>
+                                            {tag.title}
+                                        </Button>
+
+                                        <Button
+                                            variant={tag.tagType === "Custom" ? "warning" : "primary"}
+                                            disabled>
+                                            {tag.postSize}
+                                        </Button>
+
+                                    </ButtonGroup>
+                                ))}
+                            </Modal.Body>
+                        </Modal>
+
+                        <NavDropdown
+                            title={<i className="bi bi-infinity"></i>}
+                            id="basic-nav-dropdown"
+                            focusFirstItemOnShow>
+
+                            <NavDropdown.Item
+                                className="p-0 px-1 d-flex flex-column"
+                                as="span">
+
+                                <Form.Label
+                                    htmlFor="changePostLimit"
+                                    children={<p className="text-center m-0">Post Limits</p>} />
+
+                                <Container
+                                    fluid
+                                    className="d-flex p-0 align-items-center">
                                     <p className="m-0">10</p>
                                     <Form.Range
                                         id="changePostLimit"
@@ -118,33 +178,39 @@ export default function PostsNavigation() {
 
                             </NavDropdown.Item>
                         </NavDropdown>
-                        <NavDropdown title={<i className="bi bi-gear"></i>} id="basic-nav-dropdown">
+
+                        <NavDropdown
+                            title={<i className="bi bi-gear"></i>}
+                            id="basic-nav-dropdown">
+
                             <NavDropdown.Item onClick={handleChangeDarkMode}>
                                 {state.darkMode
                                     ? <div className="text-warning">
                                         <i className="bi bi-brightness-high"></i> Light Mode
                                     </ div>
                                     : <><i className="bi bi-moon"></i> Dark Mode</>}
-
                             </NavDropdown.Item>
+
                             <NavDropdown.Item
                                 onClick={() => handleChangePostType(1)}
                                 className="text-danger">
                                 <i className="bi bi-bookmark"></i> Saved
 
                             </NavDropdown.Item>
+
                             <NavDropdown.Item
                                 onClick={() => handleChangePostType(2)}
                                 className="text-primary">
                                 <i className="bi bi-arrow-up"></i> Voted
-
                             </NavDropdown.Item>
 
                             <NavDropdown.Divider />
+
                             <NavDropdown.Item>
                                 <i className="bi bi-arrow-repeat"></i> Sync Posts
                             </NavDropdown.Item>
                         </NavDropdown>
+
                     </Nav>
                 </Navbar.Collapse>
             </Container>

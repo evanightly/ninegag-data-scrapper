@@ -14,6 +14,7 @@ const Post = ({ post }) => {
                 variant="top"
                 onBlur={(e) => e.target.pause()}
                 onPlay={(e) => e.target.volume = config.DEFAULT_MEDIA_VOLUME}
+                onError={(e) => console.log("Error when loading on post " + post.id)}
                 controls={mediaType === "Animated" ? true : false}
                 as={mediaType === "Animated" ? "video" : "img"}
                 src={mediaType === "Animated" ? mediaSources.image460sv.url : mediaSources.image700.url} />

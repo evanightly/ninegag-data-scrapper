@@ -19,6 +19,11 @@ body.darkMode {
   background-color: var(--darkColor);
 }
 
+body.darkMode .tag-modal .modal-content{
+  background-color: var(--darkColor-2);
+  color: var(--lightColor);
+}
+
 body.darkMode .pagination .page-item:not(.disabled) .page-link {
   color: var(--danger);
 }
