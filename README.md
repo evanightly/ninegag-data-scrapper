@@ -31,8 +31,8 @@ This programs may have bugs so.. I'll try my best to fix them
 
 ### Future Updates
 - Server
-
   - Delete deleted post
 
 - Client
+  - Update tags in navigation when there is new tag in specific post
   - Cross get data server - client when scraping (sending scrap progress to client side)

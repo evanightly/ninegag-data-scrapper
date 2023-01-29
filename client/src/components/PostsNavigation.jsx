@@ -9,10 +9,12 @@ export default function PostsNavigation() {
 
     const [showModal, setShowModal] = useState(false)
 
+    const [searchQuery, setSearchQuery] = useState('')
+
     const handleSubmit = useCallback(async (e) => {
         e.preventDefault()
         const { data: posts } = await axios
-            .get(config.SERVER_ORIGIN + '/post/search', { params: { searchQuery: state.postSearch } })
+            .get(config.SERVER_ORIGIN + '/post/search', { params: { searchQuery } })
 
         posts.length > 100
             ? (
@@ -21,22 +23,19 @@ export default function PostsNavigation() {
                     {alert("Search result more than 100 posts, please try to be more specific, or check the console for the results")}
                 </>
             )
-            : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: '', searchMode: true } })
-    }, [ACTIONS, dispatch, state.postSearch])
+            : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: searchQuery } })
 
-    const handleChangeSearch = useCallback(e => {
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: e.target.value } })
-    }, [ACTIONS, dispatch])
+        setSearchQuery('')
+    }, [ACTIONS.SET_REDUCER, dispatch, searchQuery])
 
-    const handleChangePostType = (postType) => {
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType } })
-    }
+    const handleChangeSearch = (e => setSearchQuery(e.target.value))
+
+    const handleChangePostType = (postType) => dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType, page: 1 } })
 
     const handleChangePostLimit = async (e) => {
         const postLimit = parseInt(e.target.value)
-        let { data: postTotal } = await axios
-            .get(config.SERVER_ORIGIN + '/post/total/' + state.postType)
-
+        const url = config.SERVER_ORIGIN + '/post/total/' + state.postType
+        let { data: postTotal } = await axios.get(url)
         postTotal = Math.ceil(postTotal / postLimit)
         dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
     }
@@ -45,20 +44,20 @@ export default function PostsNavigation() {
         dispatch({ type: ACTIONS.SET_REDUCER, payload: { darkMode: !state.darkMode } })
     }
 
-    const handleReset = () => {
-        if (state.searchMode) {
+    const handleReset = async () => {
+        if (state.postSearch) {
             const { SERVER_ORIGIN } = config
-            axios
-                .get(`${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`)
-                .then(({ data: posts }) => {
-                    dispatch({ type: ACTIONS.SET_REDUCER, payload: { searchMode: false, posts } })
-                })
+            const url = `${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`
+            const { data: posts } = await axios.get(url)
+            dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: '', posts } })
         }
     }
 
-    const handleSelectedTag = async (_id) => {
-        const { data: posts } = await axios.get(config.SERVER_ORIGIN + '/tag/' + _id)
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, searchMode: true } })
+    const handleSelectedTag = async (tag) => {
+        const { _id, title } = tag
+        const url = config.SERVER_ORIGIN + '/tag/' + _id
+        const { data: posts } = await axios.get(url)
+        dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: title } })
         setShowModal(false)
     }
 
@@ -68,9 +67,7 @@ export default function PostsNavigation() {
             : $('body').removeClass('darkMode')
     }, [state.darkMode])
 
-    useEffect(() => {
-        window.scrollTo(0, 0)
-    }, [state.page])
+    useEffect(() => { window.scrollTo(0, 0) }, [state.page])
 
     useEffect(() => {
         axios
@@ -102,14 +99,14 @@ export default function PostsNavigation() {
                     <Form
                         onSubmit={handleSubmit}
                         className="w-100">
-                            
+
                         <InputGroup className="w-25 mx-auto">
                             <Form.Control
                                 placeholder="Search"
                                 aria-label="Username"
                                 aria-describedby="basic-addon1"
                                 style={{ borderTopLeftRadius: "50px", borderBottomLeftRadius: "50px", border: "none" }}
-                                value={state.postSearch}
+                                value={searchQuery}
                                 required
                                 onChange={handleChangeSearch}
                             />
@@ -144,7 +141,7 @@ export default function PostsNavigation() {
                                     <ButtonGroup key={index}>
                                         <Button
                                             variant={tag.tagType === "Custom" ? "warning" : "primary"}
-                                            onClick={() => handleSelectedTag(tag._id)}>
+                                            onClick={() => handleSelectedTag(tag)}>
                                             {tag.title}
                                         </Button>
 

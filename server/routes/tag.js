@@ -10,37 +10,36 @@ router.get('/', async (req, res) => {
 })
 
 router.post('/', async (req, res) => {
-    let { postId, title } = req.body
-    title = title.toLowerCase()
-    const addedTag = await Tag.findOne({ title, tagType: 'Custom' })
+    let { post_id, tagTitle } = req.body
+    tagTitle = tagTitle.toLowerCase()
+    const addedTag = await Tag.findOne({ title: tagTitle, tagType: 'Custom' })
 
-    let result = {
+    let result = {}
 
-    }
     if (!addedTag) {
         const createdTag = await Tag.create({
-            title,
+            title: tagTitle,
             tagType: 'Custom',
-            posts: [postId]
+            posts: [post_id]
         })
 
         result.resultType = 'New'
-        result.post = await Post.findByIdAndUpdate(postId, { $addToSet: { tags: createdTag._id } }, { new: true }).populate('tags')
+        result.post = await Post.findByIdAndUpdate(post_id, { $addToSet: { tags: createdTag._id } }, { new: true }).populate('tags')
         result.tag = createdTag
     } else {
-        const createdTag = await Tag.findByIdAndUpdate(addedTag._id, { $addToSet: { posts: postId } }, { new: true })
+        const createdTag = await Tag.findByIdAndUpdate(addedTag._id, { $addToSet: { posts: post_id } }, { new: true })
 
         result.resultType = 'Update'
-        result.post = await Post.findByIdAndUpdate(postId, { $addToSet: { tags: addedTag._id } }, { new: true }).populate('tags')
+        result.post = await Post.findByIdAndUpdate(post_id, { $addToSet: { tags: addedTag._id } }, { new: true }).populate('tags')
         result.tag = createdTag
     }
     res.send(result)
 })
 
 router.post('/remove', async (req, res) => {
-    const { postId, tagId } = req.body
-    const post = await Post.findByIdAndUpdate(postId, { $pull: { tags: tagId } }, { new: true }).populate('tags')
-    const tag = await Tag.findByIdAndUpdate(tagId, { $pull: { posts: postId } }, { new: true })
+    const { post_id, tag_id } = req.body
+    const post = await Post.findByIdAndUpdate(post_id, { $pull: { tags: tag_id } }, { new: true }).populate('tags')
+    const tag = await Tag.findByIdAndUpdate(tag_id, { $pull: { posts: post_id } }, { new: true })
 
     if (!tag.posts.length) {
         await Tag.findByIdAndDelete(tag._id)

@@ -12,7 +12,6 @@ export default function App() {
   const initialState = {
     page: 1,
     darkMode: true,
-    searchMode: false,
     postLimit: 10,
     postTotal: 0,
     postType: 1, // 1 means saved, 2 means voted
