@@ -1,6 +1,6 @@
 import { Button, ButtonGroup, Container, Form, InputGroup, Modal, Nav, NavDropdown, Navbar } from "react-bootstrap";
 import { ThemeContext } from "../App";
-import { useContext, useEffect, useCallback, useState } from "react";
+import { useContext, useEffect, useCallback, useState, memo, useRef } from "react";
 import $ from 'jquery'
 import axios from "axios";
 import config from '../config'
@@ -9,9 +9,10 @@ export default function PostsNavigation() {
 
     const [showModal, setShowModal] = useState(false)
 
-    const [searchQuery, setSearchQuery] = useState('')
+    const searchRef = useRef()
 
     const handleSubmit = useCallback(async (e) => {
+        const searchQuery = searchRef.current.value
         e.preventDefault()
         const { data: posts } = await axios
             .get(config.SERVER_ORIGIN + '/post/search', { params: { searchQuery } })
@@ -24,20 +25,19 @@ export default function PostsNavigation() {
                 </>
             )
             : dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postSearch: searchQuery } })
+    }, [ACTIONS.SET_REDUCER, dispatch])
 
-        setSearchQuery('')
-    }, [ACTIONS.SET_REDUCER, dispatch, searchQuery])
-
-    const handleChangeSearch = (e => setSearchQuery(e.target.value))
 
     const handleChangePostType = (postType) => dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType, page: 1 } })
 
     const handleChangePostLimit = async (e) => {
-        const postLimit = parseInt(e.target.value)
-        const url = config.SERVER_ORIGIN + '/post/total/' + state.postType
-        let { data: postTotal } = await axios.get(url)
-        postTotal = Math.ceil(postTotal / postLimit)
-        dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
+        setTimeout(async () => {
+            const postLimit = parseInt(e.target.value)
+            const url = config.SERVER_ORIGIN + '/post/total/' + state.postType
+            let { data: postTotal } = await axios.get(url)
+            postTotal = Math.ceil(postTotal / postLimit)
+            dispatch({ type: ACTIONS.SET_REDUCER, payload: { postLimit, postTotal } })
+        }, 1000)
     }
 
     const handleChangeDarkMode = () => {
@@ -49,7 +49,9 @@ export default function PostsNavigation() {
             const { SERVER_ORIGIN } = config
             const url = `${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`
             const { data: posts } = await axios.get(url)
-            dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: '', posts } })
+            dispatch({ type: ACTIONS.SET_REDUCER, payload: { postSearch: '', posts, } })
+        } else {
+            dispatch({ type: ACTIONS.SET_REDUCER, payload: { postType: 1 } })
         }
     }
 
@@ -75,7 +77,7 @@ export default function PostsNavigation() {
             .then(({ data: postTags }) => dispatch({ type: ACTIONS.SET_REDUCER, payload: { postTags } }))
     }, [ACTIONS.SET_REDUCER, dispatch])
 
-    return (
+    const MemoNavbar = memo(() => (
         <Navbar
             bg={state.darkMode ? "danger" : "primary"}
             expand="lg"
@@ -102,13 +104,12 @@ export default function PostsNavigation() {
 
                         <InputGroup className="w-25 mx-auto">
                             <Form.Control
+                                ref={searchRef}
                                 placeholder="Search"
                                 aria-label="Username"
                                 aria-describedby="basic-addon1"
                                 style={{ borderTopLeftRadius: "50px", borderBottomLeftRadius: "50px", border: "none" }}
-                                value={searchQuery}
                                 required
-                                onChange={handleChangeSearch}
                             />
 
                             <InputGroup.Text
@@ -178,7 +179,7 @@ export default function PostsNavigation() {
                                         step={10}
                                         max={100}
                                         min={10}
-                                        value={state.postLimit}
+                                        defaultValue={state.postLimit}
                                         className="mx-2"
                                         onChange={handleChangePostLimit} />
                                     <p className="m-0">100</p>
@@ -223,5 +224,6 @@ export default function PostsNavigation() {
                 </Navbar.Collapse>
             </Container>
         </Navbar>
-    )
+    ), [state.postTags])
+    return <MemoNavbar />
 }

@@ -3,9 +3,10 @@ import {
     memo,
     useContext,
     useMemo,
+    useRef,
     useState
 } from "react";
-import { Badge, Button, Card, Form, Modal } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { ThemeContext } from "../App";
 import config from '../config';
@@ -13,72 +14,126 @@ import config from '../config';
 const Post = ({ postProps }) => {
     const [post, setPost] = useState(postProps)
     const [show, setShow] = useState(false)
-    
 
-    const Media = memo(() => {
-        const { mediaType, mediaSources } = post
+    const PostMedia = memo(() => {
+        const { mediaType, id } = post
+        const handlePauseOnBlur = e => e.target.pause()
+        const handleDefaultVolume = e => e.target.volume = config.DEFAULT_MEDIA_VOLUME
+        const handleControls = () => mediaType === "Animated" ? true : false
+        const handleSubstituteElement = () => mediaType === "Animated" ? "video" : "img"
+        const handleMediaSource = () => {
+            let source =
+                mediaType === "Animated"
+                    ? `/media/video/${id}`
+                    : `/media/image/${id}`
+            return config.SERVER_ORIGIN + source
+        }
+
         return (
             <Card.Img
                 height="100%"
                 variant="top"
-                onBlur={(e) => e.target.pause()}
-                onPlay={(e) => e.target.volume = config.DEFAULT_MEDIA_VOLUME}
+                onBlur={handlePauseOnBlur}
+                onPlay={handleDefaultVolume}
                 onError={(e) => console.log("Error when loading on post " + post.id)}
-                controls={mediaType === "Animated" ? true : false}
-                as={mediaType === "Animated" ? "video" : "img"}
-                src={mediaType === "Animated" ? mediaSources.image460sv.url : mediaSources.image700.url} />
+                controls={handleControls()}
+                as={handleSubstituteElement()}
+                src={handleMediaSource()} />
         )
     }, [post])
 
-    const hideModal = () => setShow(false)
+    const PostAuthor = memo(() => {
+        const style = {
+            width: "30px",
+            height: "30px",
+            borderRadius: "50%",
+        }
+        return post.author
+            ? <a href={`https://9gag.com/u/${post.author.username}`} target='_blank' rel='noreferrer'>
+                <img style={style} src={post.author.avatarUrl} alt={post.id} />
+            </a>
+            : <></>
+    }, [postProps])
 
+    const hideModal = () => setShow(false)
     const showModal = () => setShow(true)
 
     const PostModal = memo(props => {
-        const [tag, setTag] = useState('')
+        const { state } = useContext(ThemeContext)
 
-        const handleInputTag = (e) => setTag(e.target.value)
+        const inputRef = useRef()
+        const submitRef = useRef()
 
         const handleSubmit = async (e) => {
             e.preventDefault()
+            const tag = inputRef.current.value
             const { post: postData, setPost } = props
-            const url = config.SERVER_ORIGIN + '/tag'
+            const url = `${config.SERVER_ORIGIN}/tag`
             const body = { post_id: postData._id, tagTitle: tag }
             const { data: { post } } = await axios.post(url, body)
             setPost(post)
             hideModal()
         }
 
-        return (
-            <Modal show={show} onHide={hideModal}>
-                <Modal.Header closeButton>
-                    <Modal.Title>Add Custom Tag</Modal.Title>
-                </Modal.Header>
-                <Form onSubmit={handleSubmit}>
-                    <Modal.Body>
-                        <Form.Group>
-                            <Form.Control onChange={handleInputTag} value={tag} required />
-                            <Form.Text className="text-muted">
-                                Your custom tag will be different from the usual tag
-                            </Form.Text>
-                        </Form.Group>
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="secondary" onClick={hideModal}>
-                            Close
-                        </Button>
-                        <Button variant="primary" type="submit">
-                            Create
-                        </Button>
-                    </Modal.Footer>
-                </Form>
-            </Modal>
-        )
+        const PostModalBody = memo(() => {
+            const handleFastTag = (e) => {
+                inputRef.current.value = e.target.innerText
+                submitRef.current.click()
+            }
+            return (
+                <Modal size='lg' show={show} onHide={hideModal}>
+                    <Container>
+                        <Row >
+                            <Col>
+                                <Modal.Header>
+                                    <Modal.Title>Add Custom Tag</Modal.Title>
+                                </Modal.Header>
+                                <Form onSubmit={handleSubmit}>
+                                    <Modal.Body>
+                                        <Form.Group>
+                                            <Form.Control ref={inputRef} required />
+                                            <Form.Text className="text-muted">
+                                                Your custom tag will be different from the usual tag
+                                            </Form.Text>
+                                        </Form.Group>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={hideModal}>
+                                            Close
+                                        </Button>
+                                        <Button variant="primary" type="submit" ref={submitRef}>
+                                            Create
+                                        </Button>
+                                    </Modal.Footer>
+                                </Form>
+                            </Col>
+                            <div className="vr"></div>
+                            <Col>
+                                <Modal.Header closeButton>
+                                    <Modal.Title>Available Tags</Modal.Title>
+                                </Modal.Header>
+                                <Form onSubmit={handleSubmit}>
+                                    <Modal.Body>
+                                        <Form.Group>
+                                            {state.postTags.map((tag, index) => tag.tagType === "Custom" &&
+                                                <Button key={index} onClick={handleFastTag} variant='outline-warning' children={tag.title} />
+                                            )}
+                                        </Form.Group>
+                                    </Modal.Body>
+                                </Form>
+                            </Col>
+                        </Row>
+                    </Container>
+                </Modal>
+            )
+        }, [show])
+
+        return <PostModalBody />
     }, [show])
 
     const PostTags = memo(() => {
         const postData = post
-        
+
         const handleDeleteTag = async (tag) => {
             if (tag.tagType === "Custom") {
                 const { _id: tag_id } = tag
@@ -136,27 +191,38 @@ const Post = ({ postProps }) => {
     }
 
     const PostBody = memo(() => {
-        return JSON.stringify(post) !== "{}" && (
-            <Card style={{ width: 300 }}>
-                <Media />
-                <PostModal
-                    post={post}
-                    setPost={setPost} />
-                <Card.Body>
-                    <PostTitle />
-                    <Card.Text>
-                        <PostTags post={post} />
-                        <AddNewTag />
-                    </Card.Text>
-                </Card.Body>
-                <Card.Footer>
-                    <PostDate />
-                </Card.Footer>
-            </Card>
+        const PostCard = ({ children }) => <Card style={{ width: 300 }} children={children} />
+        const PostBody = ({ children }) => (
+            <Card.Body>
+                <PostTitle />
+                <Card.Text>
+                    <PostTags post={post} />
+                    <AddNewTag />
+                </Card.Text>
+            </Card.Body>
+        )
+        const PostFooter = ({ children }) => (
+            <Card.Footer className="d-flex justify-content-between align-items-center">
+                <PostAuthor />
+                <PostDate />
+            </Card.Footer>
+        )
+
+        return (
+            <PostCard>
+                <PostMedia />
+                <PostBody />
+                <PostFooter />
+            </PostCard>
         )
     }, [post])
 
-    return <PostBody />
+    return (
+        <>
+            <PostModal post={post}
+                setPost={setPost} />
+            <PostBody />
+        </>)
 }
 
 export default function Posts() {
@@ -165,10 +231,14 @@ export default function Posts() {
     useMemo(() => {
         console.log("Get Data")
         const { SERVER_ORIGIN } = config
+
+        const url = `${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`
         axios
-            .get(`${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`)
+            .get(url)
             .then(({ data: posts }) => {
-                axios.get(SERVER_ORIGIN + '/post/total/' + state.postType).then(({ data: postTotal }) => {
+                const url = `${SERVER_ORIGIN}/post/total/${state.postType}`
+
+                axios.get(url).then(({ data: postTotal }) => {
                     postTotal = Math.ceil(postTotal / state.postLimit)
                     dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postTotal } })
                 })

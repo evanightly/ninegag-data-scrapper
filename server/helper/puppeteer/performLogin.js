@@ -10,10 +10,8 @@ const performLogin = async (browser) => {
         await page.goto(LOGIN_DOMAIN)
         await page.type(LOGIN.FIELD_USERNAME, USER_CREDENTIALS.USERNAME_OR_EMAIL)
         await page.type(LOGIN.FIELD_PASSWORD, USER_CREDENTIALS.PASSWORD)
-        await page.screenshot({ path: "screenshots/login.jpg" })
         await page.click(LOGIN.BUTTON_LOGIN)
         await page.waitForNavigation({ waitUntil: 'networkidle2' })
-        await page.screenshot({ path: "screenshots/logged.jpg" })
         await page.close()
     } catch (error) {
         console.log("Your ip might be blocked by cloudflare at the moment, please try again later", error)

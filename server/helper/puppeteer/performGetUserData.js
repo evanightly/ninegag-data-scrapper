@@ -9,9 +9,9 @@ const performGetUserData = async (browser) => {
         userData && await UserData.findByIdAndRemove(userData._id)
         await page.goto(NINEGAG_DOMAIN)
         // await page.waitForNavigation({ waitUntil: 'networkidle2' })
-        await page.screenshot({ path: "./screenshots/main.jpg" })
+        // await page.screenshot({ path: "./screenshots/main.jpg" })
 
-        const localStorage = await page.evaluate(() => JSON.parse(window.localStorage.userState).user);
+        const localStorage = await page.evaluate(() => JSON.parse(window.localStorage.userState).userInfo);
         await page.close()
         return localStorage
     } catch (error) {

@@ -3,6 +3,8 @@ const performGetPostData = require('./performGetPostData')
 const Post = require('../../model/Post')
 const RemovedPost = require('../../model/RemovedPost')
 const Tag = require('../../model/Tag')
+const download = require('download-file')
+
 const performGetPost = async (browser, postChunks, type = 1) => {
     console.log("Performing scrap for type ", type)
     // let type = await findOne({ type: postType }).exec()
@@ -23,6 +25,28 @@ const performGetPost = async (browser, postChunks, type = 1) => {
         for (const post of posts) {
             console.log(`Next queue : ${post}`)
             const postData = await performGetPostData(browser, post, type)
+
+            let url = ""
+            const options = {}
+
+            // Perform download the media file
+            if (postData.hasOwnProperty('mediaSources')) {
+                if (postData.mediaType === "Animated") {
+                    url = postData.mediaSources.image460sv.url
+                    options.directory = "./public/video/"
+                    options.filename = `${postData.id}.mp4`
+                } else {
+                    url = postData.mediaSources.image700.url
+                    options.directory = "./public/image/"
+                    options.filename = `${postData.id}.jpg`
+                }
+                download(url, options, err => {
+                    if (err) throw err
+                    console.log('File Downloaded')
+                })
+            }
+
+
             if (postData.tags) {
                 let postTags = []
                 // Create new tag
@@ -39,7 +63,7 @@ const performGetPost = async (browser, postChunks, type = 1) => {
 
                 // Reasign tags object value with newly created object
                 postData.tags = postTags
-                
+
                 const newPost = await Post.create(postData)
                 for (const tag of newPost.tags) {
                     await Tag.findByIdAndUpdate(tag, { $push: { posts: newPost._id } })

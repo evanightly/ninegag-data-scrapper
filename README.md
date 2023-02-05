@@ -5,7 +5,7 @@ Used to get your 9gag saved and voted data, then display it into your own websit
 1. Login with your 9gag credentials
 2. Scanning your userdata in localstorage
 3. Sync data with scrapped one (if any)
-4. Scrap each post then pushed into database
+4. Scrap each post and **download each media file and save it into public folder** then pushed into database
 5. Open client side (http://localhost:3000)
 6. Happy bookmarking!
 
@@ -36,3 +36,5 @@ This programs may have bugs so.. I'll try my best to fix them
 - Client
   - Update tags in navigation when there is new tag in specific post
   - Cross get data server - client when scraping (sending scrap progress to client side)
+  - Fix rerender when new tag modal opened
+  - Resync tags when adding/removing custom tags

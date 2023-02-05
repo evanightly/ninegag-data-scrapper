@@ -41,7 +41,8 @@ router.get('/sync', async (req, res) => {
         const votedPostNumber = 2
         savedPostChunk.length > 0 && await performGetPost(browser, savedPostChunk, savedPostNumber)
         votedPostChunk.length > 0 && await performGetPost(browser, votedPostChunk, votedPostNumber)
-        res.send("Data synced")
+        console.log("Data Synced")
+        res.send("Data Synced")
     } catch (error) {
         console.log(error)
         res.send("Something wrong, please check server console, for further information")

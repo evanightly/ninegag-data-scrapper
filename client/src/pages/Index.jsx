@@ -14,7 +14,7 @@ export default function Index() {
         let header = (state.postType === 1 ? "Saved" : "Voted") + " Post"
         if (state.postSearch)
             header = `Search for '${state.postSearch}'`
-        return <h3 className="text-light">{header}</h3>
+        return <h3 className={state.darkMode ? "text-light" : "text-dark"}>{header}</h3>
     }, [state.postType, state.postSearch])
 
     return (

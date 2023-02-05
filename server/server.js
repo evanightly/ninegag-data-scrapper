@@ -1,18 +1,15 @@
-const UserData = require('./model/UserData')
-const Post = require('./model/Post')
-
 const puppeteer = require("puppeteer")
 const mongoose = require('mongoose')
 const express = require("express")
 const cors = require("cors")
 require("dotenv").config()
-const fs = require("fs")
+
 
 const app = express()
 const CONFIG = require('./config.json')
-const Tag = require('./model/Tag')
 const post = require('./routes/post')
 const tag = require('./routes/tag')
+const media = require('./routes/media')
 
 let browser
 app
@@ -21,6 +18,7 @@ app
     .use(cors())
     .use('/post', post)
     .use('/tag', tag)
+    .use('/media', media)
 
 const init = async () => {
     mongoose.set('strictQuery', true)
