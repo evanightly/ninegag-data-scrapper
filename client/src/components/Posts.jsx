@@ -4,9 +4,10 @@ import {
     useContext,
     useMemo,
     useRef,
-    useState
+    useState,
+    useTransition
 } from "react";
-import { Badge, Button, Card, Col, Container, Form, Modal, Row } from 'react-bootstrap';
+import { Badge, Button, Card, Col, Container, Form, Modal, Row, Stack } from 'react-bootstrap';
 import Masonry, { ResponsiveMasonry } from "react-responsive-masonry";
 import { ThemeContext } from "../App";
 import config from '../config';
@@ -114,11 +115,11 @@ const Post = ({ postProps }) => {
                                 </Modal.Header>
                                 <Form onSubmit={handleSubmit}>
                                     <Modal.Body>
-                                        <Form.Group>
+                                        <Stack direction='horizontal' className='gap-2'>
                                             {state.postTags.map((tag, index) => tag.tagType === "Custom" &&
                                                 <Button key={index} onClick={handleFastTag} variant='outline-warning' children={tag.title} />
                                             )}
-                                        </Form.Group>
+                                        </Stack>
                                     </Modal.Body>
                                 </Form>
                             </Col>
@@ -228,21 +229,24 @@ const Post = ({ postProps }) => {
 export default function Posts() {
     const { ACTIONS, state, dispatch } = useContext(ThemeContext)
 
+    const [isPending, startTransition] = useTransition()
     useMemo(() => {
         console.log("Get Data")
         const { SERVER_ORIGIN } = config
 
         const url = `${SERVER_ORIGIN}/post/${state.postType}/${(state.page - 1) * state.postLimit}/${state.postLimit}`
-        axios
-            .get(url)
-            .then(({ data: posts }) => {
-                const url = `${SERVER_ORIGIN}/post/total/${state.postType}`
+        startTransition(() =>
+            axios
+                .get(url)
+                .then(({ data: posts }) => {
+                    const url = `${SERVER_ORIGIN}/post/total/${state.postType}`
 
-                axios.get(url).then(({ data: postTotal }) => {
-                    postTotal = Math.ceil(postTotal / state.postLimit)
-                    dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postTotal } })
+                    axios.get(url).then(({ data: postTotal }) => {
+                        postTotal = Math.ceil(postTotal / state.postLimit)
+                        dispatch({ type: ACTIONS.SET_REDUCER, payload: { posts, postTotal } })
+                    })
                 })
-            })
+        )
     }, [state.postType, state.page, state.postLimit, dispatch, ACTIONS.SET_REDUCER])
 
     const Posts = memo(() => {
@@ -255,12 +259,14 @@ export default function Posts() {
         }
 
         return (
-            <ResponsiveMasonry
-                columnsCountBreakPoints={breakpoints}>
-                <Masonry gutter="70px">
-                    {state.posts.map((post, index) => <Post key={index} postProps={post} />)}
-                </Masonry>
-            </ResponsiveMasonry>
+            isPending
+                ? "Loading"
+                : <ResponsiveMasonry
+                    columnsCountBreakPoints={breakpoints}>
+                    <Masonry gutter="70px">
+                        {state.posts.map((post, index) => <Post key={index} postProps={post} />)}
+                    </Masonry>
+                </ResponsiveMasonry>
         )
     }, [state.posts])
     return <Posts />

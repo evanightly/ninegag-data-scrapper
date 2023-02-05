@@ -22,7 +22,7 @@ app
 
 const init = async () => {
     mongoose.set('strictQuery', true)
-    await mongoose.connect(CONFIG.MONGODB_CREDENTIALS.DB_URI)
+    await mongoose.connect(CONFIG.MONGODB_CREDENTIALS.DB_URI, { serverSelectionTimeoutMS: 1000 })
         .then(() => console.log('Connected to database'))
         .catch(error => console.log("Error when connecting to database, it might be service has stopped", error))
     browser = await puppeteer.launch({
