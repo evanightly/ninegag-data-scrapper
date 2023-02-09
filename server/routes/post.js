@@ -19,9 +19,9 @@ router.get('/search', async (req, res) => {
     res.json(result);
 })
 
-router.get('/unsynced', async (req, res) => {
+router.get('/unSynced', async (req, res) => {
     const [savedPost, votedPost] = await performSyncUserData(browser);
-    res.json({ unsyncedSaved: savedPost.length, unsyncedVoted: votedPost.length })
+    res.json({ unSyncedSaved: savedPost.length, unSyncedVoted: votedPost.length })
 })
 
 router.get('/sync', async (req, res) => {
