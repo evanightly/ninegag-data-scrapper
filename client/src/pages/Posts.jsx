@@ -33,29 +33,26 @@ export default function Posts() {
     const [tag, setTag] = useState([])
     // useLayoutEffect(() => setTag(state.tags), [state.tags])
 
-    const { getPost, getPostTotal, getTag } = {
-        getPost: `${SERVER_ORIGIN}/post/${postType}/${pageIndex * postLimit}/${postLimit}`,
-        getPostTotal: `${SERVER_ORIGIN}/post/total/${postType}`,
-        getTag: `${SERVER_ORIGIN}/tag/`
-    }
-
     const loadPostTotal = useCallback(async () => {
+        const getPostTotal = `${SERVER_ORIGIN}/post/total/${postType}`
         const { data: total } = await axios.get(getPostTotal)
         const postTotal = Math.ceil(total / postLimit) // Counted as chunk
         setState({ postTotal })
         // eslint-disable-next-line
-    }, [state.postLimit])
+    }, [state.postLimit, state.postType])
 
     const loadPosts = useCallback(async () => {
+        const getPost = `${SERVER_ORIGIN}/post/${postType}/${pageIndex * postLimit}/${postLimit}`
         const { data: posts } = await axios.get(getPost)
         setState({ posts })
         // eslint-disable-next-line
     }, [state.postType])
 
     const loadTags = useCallback(async () => {
+        const getTag = `${SERVER_ORIGIN}/tag/`
         const { data: tags } = await axios.get(getTag)
         setTag(tags)
-    }, [getTag])
+    }, [])
 
     const initialize = useCallback(() => {
         loadPosts()
@@ -79,6 +76,7 @@ export default function Posts() {
 
     useEffect(() => {
         const loadNextPost = async () => {
+            const getPost = `${SERVER_ORIGIN}/post/${postType}/${pageIndex * postLimit}/${postLimit}`
             const { data: posts } = await axios.get(getPost)
             setState({ posts })
         }
