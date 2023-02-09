@@ -71,7 +71,7 @@ export default function PostPagination() {
     const MainPostPagination = () => {
         if (postSearch.trim().length <= 0) {
             return (
-                <Pagination className="m-0">
+                <Pagination id="post-pagination" className="m-0">
                     <Pagination.First onClick={handleFirstPage} />
                     <ShowPrev />
                     <Pagination.Item active={currentPage <= displayLimit}>{currentPage <= displayLimit ? currentPage : 1}</Pagination.Item>

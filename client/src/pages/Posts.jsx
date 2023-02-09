@@ -8,6 +8,7 @@ import PostPagination from "../components/PostPagination"
 import PostNavbar from "../components/PostNavbar"
 import useCustomState from "../hooks/useCustomState"
 import PostFooter from "../components/PostFooter"
+import $ from 'jquery'
 
 const { SERVER_ORIGIN } = config
 
@@ -85,6 +86,13 @@ export default function Posts() {
         // eslint-disable-next-line
     }, [state.postLimit, state.pageIndex])
 
+    useEffect(() => {
+        if (state.darkMode) {
+            $('body').addClass('darkMode')
+        } else {
+            $('body').removeClass('darkMode')
+        }
+    }, [state.darkMode])
     const customTags = useMemo(() => tag.filter(tag => tag.tagType === "Custom"), [tag])
 
     const MemoPosts = useMemo(() => {
@@ -129,7 +137,7 @@ export default function Posts() {
         if (state.postSearch.length > 0) {
             headerText = `Search for ${state.postSearch}`
         }
-        return <h3 className="m-0">{headerText}</h3>
+        return <h3 id="post-header" className="m-0">{headerText}</h3>
 
     }
     return (

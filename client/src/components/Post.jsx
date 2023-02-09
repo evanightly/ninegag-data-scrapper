@@ -11,7 +11,7 @@ export default function Post({ post }) {
     const { id, title, author, dateCreated } = state
 
     return (
-        <Card style={{ width: '18rem' }}>
+        <Card style={{ width: '18rem' }} id="post-card">
             <Media />
             <Card.Body>
                 <Card.Title>

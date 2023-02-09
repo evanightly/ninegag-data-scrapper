@@ -40,7 +40,7 @@ export default function PostNavbar() {
     }
 
     function TagsModal() {
-        const { setState } = useContext(StateContext)
+        const { state, setState } = useContext(StateContext)
         const { tag } = useContext(TagContext)
         const { SERVER_ORIGIN } = config
         const handleSelectedTag = async (tag) => {
@@ -51,13 +51,20 @@ export default function PostNavbar() {
             handleHideModal()
         }
 
+        const ModalHeader = () => {
+            const children = <Modal.Title>Tags</Modal.Title>
+            let parent
+            state.darkMode
+                ? parent = <Modal.Header closeButton closeVariant='white' children={children} />
+                : parent = <Modal.Header closeButton children={children} />
+            return parent
+        }
+
         const MemoTagsModal = useMemo(() => (
             <>
                 <Nav.Link children={<i className="bi bi-tags-fill"></i>} onClick={handleShowModal} />
-                <Modal show={showModal} onHide={handleHideModal} fullscreen>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Tags</Modal.Title>
-                    </Modal.Header>
+                <Modal id="tag-modal" show={showModal} onHide={handleHideModal} fullscreen>
+                    <ModalHeader />
                     <Modal.Body>
                         {tag.map((tag, index) => {
                             const variant = tag.tagType === "Custom" ? "outline-warning" : "outline-primary"
@@ -132,11 +139,25 @@ function PostLimitSlider() {
 }
 
 function PostSettings() {
-    const { setState } = useContext(StateContext)
+    const { state, setState } = useContext(StateContext)
     const handlePostType = (type) => setState({ postType: type })
 
+
+    const DarkMode = () => {
+        const handleToggleDarkMode = () => setState({ darkMode: !state.darkMode })
+        const text = state.darkMode ? "Light Mode" : "Dark Mode"
+        const icon = state.darkMode ? "bi bi-sun-fill" : "bi bi-moon-fill"
+        const iconColor = state.darkMode ? "warning" : "dark"
+        return (
+            <NavDropdown.Item onClick={handleToggleDarkMode}>
+                <i className={`${icon} text-${iconColor}`}></i> {text}
+            </NavDropdown.Item>
+        )
+
+    }
     return (
         <NavDropdown title={<i className="bi bi-gear-fill"></i>} align="end">
+            <DarkMode />
             <NavDropdown.Item onClick={() => handlePostType(1)}><i className="bi bi-bookmark-fill text-primary"></i> Saved</NavDropdown.Item>
             <NavDropdown.Item onClick={() => handlePostType(2)}><i className="bi bi-heart-fill text-danger"></i> Voted</NavDropdown.Item>
             <NavDropdown.Divider />
