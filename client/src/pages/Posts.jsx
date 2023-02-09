@@ -38,11 +38,16 @@ export default function Posts() {
         getTag: `${SERVER_ORIGIN}/tag/`
     }
 
-    const loadPosts = useCallback(async () => {
+    const loadPostTotal = useCallback(async () => {
         const { data: total } = await axios.get(getPostTotal)
-        const { data: posts } = await axios.get(getPost)
         const postTotal = Math.ceil(total / postLimit) // Counted as chunk
-        setState({ posts, postTotal })
+        setState({ postTotal })
+        // eslint-disable-next-line
+    }, [state.postLimit])
+
+    const loadPosts = useCallback(async () => {
+        const { data: posts } = await axios.get(getPost)
+        setState({ posts })
         // eslint-disable-next-line
     }, [state.postType])
 
@@ -65,6 +70,11 @@ export default function Posts() {
     useEffect(() => {
         loadPosts()
     }, [loadPosts])
+
+    useEffect(() => {
+        loadPostTotal()
+        // eslint-disable-next-line
+    }, [loadPostTotal])
 
     useEffect(() => {
         const loadNextPost = async () => {

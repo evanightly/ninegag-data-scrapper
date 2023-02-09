@@ -1,5 +1,5 @@
-import { useContext, useEffect, useState } from "react";
-import { Badge, Button, Card, Modal, Form } from "react-bootstrap";
+import { useContext, useRef, useState } from "react";
+import { Badge, Button, Card, Modal, Form, Container, Row, Col, Image } from "react-bootstrap";
 import config from '../config'
 import titleCase from "../helper/titleCase";
 import axios from "axios";
@@ -7,9 +7,6 @@ import { TagContext } from "../pages/Posts";
 
 const { SERVER_ORIGIN, DEFAULT_MEDIA_VOLUME } = config
 export default function Post({ post }) {
-    useEffect(() => {
-        console.log("Post:", post)
-    }, [post])
     const [state] = useState(post)
     const { id, title, author, dateCreated } = state
 
@@ -82,9 +79,10 @@ export default function Post({ post }) {
 
     function NewTag({ setTags }) {
         // This will allow you to add custom tag
-        const { loadTags } = useContext(TagContext)
+        const { loadTags, customTags } = useContext(TagContext)
         const [show, setShow] = useState(false)
         const [newTag, setNewTag] = useState('')
+        const submitRef = useRef(null)
         const handleShow = () => setShow(true)
         const handleClose = () => setShow(false)
         const handleChangeNewTag = e => setNewTag(e.target.value)
@@ -96,6 +94,13 @@ export default function Post({ post }) {
             setTags(post.tags)
             loadTags()
             handleClose()
+        }
+
+        const handleFastAdd = async e => {
+            await setNewTag(e.target.innerText)
+            submitRef.current.click()
+            setNewTag("")
+            setShow(false)
         }
         return (
             <>
@@ -109,26 +114,46 @@ export default function Post({ post }) {
 
                 <Modal
                     show={show}
-                    onHide={handleClose}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>Add Custom Tag</Modal.Title>
-                    </Modal.Header>
-                    <Form onSubmit={handleSubmit}>
-                        <Modal.Body>
-                            <Form.Group className="mb-3">
-                                <Form.Label>Your custom tag will be different from the usual tag</Form.Label>
-                                <Form.Control onChange={handleChangeNewTag} required />
-                            </Form.Group>
-                        </Modal.Body>
-                        <Modal.Footer>
-                            <Button variant="secondary" onClick={handleClose}>
-                                Close
-                            </Button>
-                            <Button type="submit" variant="success">
-                                Create
-                            </Button>
-                        </Modal.Footer>
-                    </Form>
+                    onHide={handleClose}
+                    size="lg">
+                    <Container fluid>
+                        <Row>
+                            <Col>
+                                <Modal.Header>
+                                    <Modal.Title>Add Custom Tag</Modal.Title>
+                                </Modal.Header>
+                                <Form onSubmit={handleSubmit}>
+                                    <Modal.Body>
+                                        <Form.Group className="mb-3">
+                                            <Form.Label>Your custom tag will be different from the usual tag</Form.Label>
+                                            <Form.Control value={newTag} onChange={handleChangeNewTag} required />
+                                        </Form.Group>
+                                    </Modal.Body>
+                                    <Modal.Footer>
+                                        <Button variant="secondary" onClick={handleClose}>
+                                            Close
+                                        </Button>
+                                        <Button type="submit" variant="success" ref={submitRef}>
+                                            Create
+                                        </Button>
+                                    </Modal.Footer>
+                                </Form>
+                            </Col>
+                            <Col>
+                                <Modal.Header>
+                                    <Modal.Title>Available Tags</Modal.Title>
+                                </Modal.Header>
+                                <Modal.Body>
+                                    <Form.Group className="mb-3 flex-row">
+                                        <Form.Label>Use this shortcut to ease input process</Form.Label>
+                                        <Container fluid className="d-flex flex-wrap gap-2 p-0">
+                                            {customTags.map(tag => <Button key={tag._id} variant="outline-warning" onClick={handleFastAdd}>{tag.title}</Button>)}
+                                        </Container>
+                                    </Form.Group>
+                                </Modal.Body>
+                            </Col>
+                        </Row>
+                    </Container>
                 </Modal>
             </>
         )
@@ -141,8 +166,8 @@ export default function Post({ post }) {
             const style = { borderRadius: "50%", width: 35, height: 35, backgroundColor: "#0080FE", display: "flex" }
             return (
                 <a href={authorProfile} target="_blank" rel="noreferrer">
-                    <div className="d-flex justify-content-center align-items-center text-light" style={style}>{author.username[0].toUpperCase()}</div>
-                    {/* <Image src={author.avatarUrl} style={style} /> */}
+                    {/* <div className="d-flex justify-content-center align-items-center text-light" style={style}>{author.username[0].toUpperCase()}</div> */}
+                    <Image src={author.avatarUrl} style={style} />
                 </a>
             )
         }
