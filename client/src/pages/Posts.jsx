@@ -74,15 +74,14 @@ export default function Posts() {
     }, [])
 
     useEffect(() => {
-        localStorage.getItem('postLimit')
-            ? setState({ postLimit: JSON.parse(localStorage.getItem('postLimit')) })
-            : localStorage.setItem('postLimit', JSON.stringify(state.postLimit))
+        new Promise(() => {
+            localStorage.getItem('postLimit')
+                ? setState({ postLimit: JSON.parse(localStorage.getItem('postLimit')) })
+                : localStorage.setItem('postLimit', JSON.stringify(state.postLimit))
+        }).then(() => loadPosts())
         // eslint-disable-next-line
     }, [])
 
-    useEffect(() => {
-        loadPosts()
-    }, [loadPosts])
 
     useEffect(() => {
         loadPostTotal()
@@ -105,7 +104,7 @@ export default function Posts() {
             $('body').removeClass('darkMode')
         }
     }, [state.darkMode])
-    const customTags = useMemo(() => tag.filter(tag => tag.tagType === "Custom"), [tag])
+
 
     const MemoPosts = useMemo(() => {
         const masonryBreakpoints = {
@@ -118,7 +117,7 @@ export default function Posts() {
         }
 
         const renderPosts = state.posts.length > 0
-            ? state.posts.map((post, index) => <Post key={post._id} post={post} />)
+            ? state.posts.map(post => <Post key={post._id} post={post} />)
             : <p>Post not found</p>
 
         return (
@@ -134,7 +133,7 @@ export default function Posts() {
     }, [isPending, state.posts])
 
     const MemoPostNavbar = useMemo(() => <PostNavbar />, [])
-
+    const MemoPostPagination = useMemo(() => <PostPagination />, [])
     // Debug
     const renderTime = useRef(0)
     useEffect(() => {
@@ -142,7 +141,6 @@ export default function Posts() {
         console.log("renderTime: ", renderTime.current)
     }, [])
 
-    const MemoPostPagination = useMemo(() => <PostPagination />, [])
 
     const Header = () => {
         let headerText = (state.postType === 1 ? "Saved" : "Voted") + " Post"
@@ -151,6 +149,8 @@ export default function Posts() {
         }
         return <h3 id="post-header" className="m-0">{headerText}</h3>
     }
+
+    const customTags = useMemo(() => tag.filter(tag => tag.tagType === "Custom"), [tag])
 
     return (
         <StateContext.Provider value={{ state, setState, initialize }}>
