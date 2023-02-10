@@ -126,7 +126,11 @@ function SearchForm() {
 
 function PostLimitSlider() {
     const { state, setState } = useContext(StateContext)
-    const handlePostLimit = e => setState({ postLimit: e.target.value })
+    const handlePostLimit = e => {
+        const { value } = e.target
+        setState({ postLimit: value })
+        localStorage.setItem('postLimit', parseInt(value))
+    }
 
     return (
         <NavDropdown title={<i className="bi bi-infinity"></i>} align="end">
@@ -144,7 +148,12 @@ function PostSettings() {
 
 
     const DarkMode = () => {
-        const handleToggleDarkMode = () => setState({ darkMode: !state.darkMode })
+        const handleToggleDarkMode = () => {
+            const toggledMode = !state.darkMode
+            setState({ darkMode: toggledMode })
+            localStorage.setItem('darkMode', JSON.stringify(toggledMode))
+        }
+
         const text = state.darkMode ? "Light Mode" : "Dark Mode"
         const icon = state.darkMode ? "bi bi-sun-fill" : "bi bi-moon-fill"
         const iconColor = state.darkMode ? "warning" : "dark"

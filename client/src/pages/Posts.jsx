@@ -1,7 +1,7 @@
 import { Stack } from "react-bootstrap"
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import Post from "../components/Post"
-import { createContext, memo, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
+import { createContext, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
 import config from '../config'
 import axios from 'axios'
 import PostPagination from "../components/PostPagination"
@@ -18,6 +18,7 @@ export const TagContext = createContext()
 export default function Posts() {
 
     const initialState = {
+        darkMode: true,
         pageIndex: 0,
         postType: 1, // 1: Saved, 2: Voted
         postLimit: 10,
@@ -28,10 +29,9 @@ export default function Posts() {
 
     const [isPending, startTransition] = useTransition()
     const [state, setState] = useCustomState(initialState)
-    const { postType, pageIndex, postLimit } = state
-
     const [tag, setTag] = useState([])
-    // useLayoutEffect(() => setTag(state.tags), [state.tags])
+
+    const { postType, pageIndex, postLimit } = state
 
     const loadPostTotal = useCallback(async () => {
         const getPostTotal = `${SERVER_ORIGIN}/post/total/${postType}`
@@ -66,12 +66,26 @@ export default function Posts() {
     }, [])
 
     useEffect(() => {
+        // Get persisted darkMode value from localStorage
+        localStorage.getItem('darkMode')
+            ? setState({ darkMode: JSON.parse(localStorage.getItem('darkMode')) })
+            : localStorage.setItem('darkMode', JSON.stringify(state.darkMode))
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
+        localStorage.getItem('postLimit')
+            ? setState({ postLimit: JSON.parse(localStorage.getItem('postLimit')) })
+            : localStorage.setItem('postLimit', JSON.stringify(state.postLimit))
+        // eslint-disable-next-line
+    }, [])
+
+    useEffect(() => {
         loadPosts()
     }, [loadPosts])
 
     useEffect(() => {
         loadPostTotal()
-        // eslint-disable-next-line
     }, [loadPostTotal])
 
     useEffect(() => {
@@ -128,7 +142,7 @@ export default function Posts() {
         console.log("renderTime: ", renderTime.current)
     }, [])
 
-    const MemoPostPagination = memo(() => <PostPagination />, [state.posts])
+    const MemoPostPagination = useMemo(() => <PostPagination />, [])
 
     const Header = () => {
         let headerText = (state.postType === 1 ? "Saved" : "Voted") + " Post"
@@ -136,16 +150,17 @@ export default function Posts() {
             headerText = `Search for ${state.postSearch}`
         }
         return <h3 id="post-header" className="m-0">{headerText}</h3>
-
     }
+
     return (
         <StateContext.Provider value={{ state, setState, initialize }}>
             <TagContext.Provider value={{ tag, customTags, loadTags }}>
                 <Stack gap={4} className="p-5">
                     {MemoPostNavbar}
                     <Header />
-                    <MemoPostPagination />
+                    {MemoPostPagination}
                     {MemoPosts}
+                    {MemoPostPagination}
                     <PostFooter />
                 </Stack>
             </TagContext.Provider>
