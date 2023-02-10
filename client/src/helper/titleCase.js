@@ -1,3 +1,3 @@
 export default function titleCase(tag) {
-    return `${tag.charAt(0).toUpperCase()}${tag.substring(1, tag.length)}`
+    return tag.split(" ").map(text => text[0].toUpperCase() + text.slice(1)).join(" ")
 } 

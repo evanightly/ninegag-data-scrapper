@@ -147,7 +147,7 @@ export default function Post({ post }) {
                                     <Form.Group className="mb-3 flex-row">
                                         <Form.Label>Use this shortcut to ease input process</Form.Label>
                                         <Container fluid className="d-flex flex-wrap gap-2 p-0">
-                                            {customTags.map(tag => <Button key={tag._id} variant="outline-warning" onClick={handleFastAdd}>{tag.title}</Button>)}
+                                            {customTags.map(tag => <Button key={tag._id} variant="outline-warning" onClick={handleFastAdd}>{titleCase(tag.title)}</Button>)}
                                         </Container>
                                     </Form.Group>
                                 </Modal.Body>
