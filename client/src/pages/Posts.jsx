@@ -1,7 +1,7 @@
 import { Stack } from "react-bootstrap"
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import Post from "../components/Post"
-import { createContext, useCallback, useEffect, useMemo, useRef, useState, useTransition } from "react"
+import { createContext, useCallback, useEffect, useMemo,  useState, useTransition } from "react"
 import config from '../config'
 import axios from 'axios'
 import PostPagination from "../components/PostPagination"
@@ -134,19 +134,11 @@ export default function Posts() {
 
     const MemoPostNavbar = useMemo(() => <PostNavbar />, [])
     const MemoPostPagination = useMemo(() => <PostPagination />, [])
-    // Debug
-    const renderTime = useRef(0)
-    useEffect(() => {
-        renderTime.current = renderTime.current + 1
-        console.log("renderTime: ", renderTime.current)
-    }, [])
-
 
     const Header = () => {
-        let headerText = (state.postType === 1 ? "Saved" : "Voted") + " Post"
-        if (state.postSearch.length > 0) {
-            headerText = `Search for ${state.postSearch}`
-        }
+        let headerText = state.postSearch.length > 0
+            ? `Search for ${state.postSearch}`
+            : (state.postType === 1 ? "Saved" : "Voted") + " Post"
         return <h3 id="post-header" className="m-0">{headerText}</h3>
     }
 

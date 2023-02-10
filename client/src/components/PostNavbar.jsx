@@ -109,8 +109,9 @@ function SearchForm() {
     return (
         <Form onSubmit={handleSubmit}>
             <Form.Group>
-                <InputGroup>
+                <InputGroup className='rounded-pill bg-light'>
                     <Form.Control
+                        className='bg-transparent border-0'
                         style={style}
                         type="text"
                         placeholder="Search"
@@ -118,6 +119,11 @@ function SearchForm() {
                         onChange={handleChangeSearch}
                         required
                     />
+                    <InputGroup.Text className='p-0 bg-transparent border-0'>
+                        <Button className='bg-transparent border-0' type='submit'>
+                            <i className="bi bi-search text-dark"></i>
+                        </Button>
+                    </InputGroup.Text>
                 </InputGroup>
             </Form.Group>
         </Form>
