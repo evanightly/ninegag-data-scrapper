@@ -1,5 +1,5 @@
 import { useContext, useMemo, useState } from 'react';
-import { Button, Form, InputGroup, Modal } from 'react-bootstrap';
+import { Button, Form, InputGroup, Modal, Spinner } from 'react-bootstrap';
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
@@ -151,7 +151,33 @@ function PostLimitSlider() {
 function PostSettings() {
     const { state, setState } = useContext(StateContext)
     const handlePostType = (type) => setState({ postType: type })
+    const [showSyncProgress, setShowSyncProgress] = useState(false)
 
+    const [scrap, setScrap] = useState({
+        scrapped: 0,
+        totalUnscrapped: 0
+    })
+
+    const handleSync = async () => {
+        const { SERVER_ORIGIN } = config
+        console.log("Syncing")
+        axios.get(SERVER_ORIGIN + '/post/sync')
+        setShowSyncProgress(true)
+
+        setInterval(async () => {
+            const { data: { maxPost, scrapped } } = await axios.get(SERVER_ORIGIN + '/scrap-progress')
+            setScrap({ scrapped, totalUnscrapped: maxPost })
+            if (maxPost > 1 && maxPost === scrapped) {
+                setShowSyncProgress(false)
+                setState({ postLimit: 10, pageIndex: 0 })
+                console.log("Complete")
+            }
+        }, 3000)
+    }
+
+    const memoSyncProgressModal = useMemo(() => {
+        return <SyncProgressModal scrapped={scrap.scrapped} totalUnscrapped={scrap.totalUnscrapped} />
+    }, [scrap])
 
     const DarkMode = () => {
         const handleToggleDarkMode = () => {
@@ -176,9 +202,27 @@ function PostSettings() {
             <NavDropdown.Item onClick={() => handlePostType(1)}><i className="bi bi-bookmark-fill text-primary"></i> Saved</NavDropdown.Item>
             <NavDropdown.Item onClick={() => handlePostType(2)}><i className="bi bi-heart-fill text-danger"></i> Voted</NavDropdown.Item>
             <NavDropdown.Divider />
-            <NavDropdown.Item>
+            <NavDropdown.Item onClick={handleSync}>
                 <i className="bi bi-arrow-repeat text-warning"></i> Sync
             </NavDropdown.Item>
+            {showSyncProgress && memoSyncProgressModal}
         </NavDropdown>
+    )
+}
+
+/**
+ * 
+ * @param {Number} current Current scrapped post
+ * @param {Number} scrapped Total un-scrapped post
+ */
+function SyncProgressModal({ scrapped, totalUnscrapped }) {
+    return (
+        <Modal id="tag-modal" show centered>
+            <Modal.Body>
+                <h2>Sync in Progress <Spinner animation="border" variant="warning" /></h2>
+                <p>{scrapped} of {totalUnscrapped} post are scrapped</p>
+                <p className="text-danger">Do not close, shutdown, or stop this process, it will result unexpected bugs!</p>
+            </Modal.Body>
+        </Modal>
     )
 }

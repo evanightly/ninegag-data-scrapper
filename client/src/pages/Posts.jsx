@@ -95,7 +95,7 @@ export default function Posts() {
         }
         startTransition(loadNextPost)
         // eslint-disable-next-line
-    }, [state.postLimit, state.pageIndex])
+    }, [state.postLimit, state.pageIndex, state.postType])
 
     useEffect(() => {
         if (state.darkMode) {

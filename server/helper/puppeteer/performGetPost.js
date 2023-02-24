@@ -4,16 +4,14 @@ const Post = require('../../model/Post')
 const RemovedPost = require('../../model/RemovedPost')
 const Tag = require('../../model/Tag')
 const download = require('download-file')
+const ScrapProgress = require('../../model/ScrapProgress')
 
 const performGetPost = async (browser, postChunks, type = 1) => {
     console.log("Performing scrap for type ", type)
-    // let type = await findOne({ type: postType }).exec()
-
-    // isPostTypeAlreadyExist = type.length
-    // if (!isPostTypeAlreadyExist) type = await create({ type: postType })
     let totalPosts = 0, currentIndex = 0
     postChunks.map(post => post.map(() => totalPosts++))
 
+    await ScrapProgress.findOneAndUpdate({}, { maxPost: totalPosts }, { upsert: true, })
     const res = []
     for (const posts of postChunks) {
         // Set pause time for each scrap, so cloudflare protection wont be triggered
@@ -46,7 +44,6 @@ const performGetPost = async (browser, postChunks, type = 1) => {
                 })
             }
 
-
             if (postData.tags) {
                 let postTags = []
                 // Create new tag
@@ -61,7 +58,7 @@ const performGetPost = async (browser, postChunks, type = 1) => {
                     }
                 }
 
-                // Reasign tags object value with newly created object
+                // Reassign tags object value with newly created object
                 postData.tags = postTags
 
                 const newPost = await Post.create(postData)
@@ -72,6 +69,7 @@ const performGetPost = async (browser, postChunks, type = 1) => {
                 await RemovedPost.create(postData)
             }
             currentIndex++
+            await ScrapProgress.findOneAndUpdate({}, { scrapped: currentIndex })
             res.push(postData)
         }
     }

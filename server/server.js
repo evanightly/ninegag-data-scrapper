@@ -10,6 +10,7 @@ const CONFIG = require('./config.json')
 const post = require('./routes/post')
 const tag = require('./routes/tag')
 const media = require('./routes/media')
+const scrapProgress = require('./routes/scrapProgress')
 
 let browser
 app
@@ -19,6 +20,7 @@ app
     .use('/post', post)
     .use('/tag', tag)
     .use('/media', media)
+    .use('/scrap-progress', scrapProgress)
 
 const init = async () => {
     mongoose.set('strictQuery', true)

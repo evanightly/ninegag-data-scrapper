@@ -29,7 +29,6 @@ router.get('/sync', async (req, res) => {
      * Note: Please login manually in case your account prevented by cloudflare security
      * If the problem still exist, please try again few hours, or tomorrow
      */
-
     try {
         const browser = req.app.locals.browser
         await performLogin(browser);
