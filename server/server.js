@@ -10,6 +10,7 @@ const CONFIG = require('./config.json')
 const post = require('./routes/post')
 const tag = require('./routes/tag')
 const media = require('./routes/media')
+const note = require('./routes/note')
 const scrapProgress = require('./routes/scrapProgress')
 
 let browser
@@ -20,6 +21,7 @@ app
     .use('/post', post)
     .use('/tag', tag)
     .use('/media', media)
+    .use('/note', note)
     .use('/scrap-progress', scrapProgress)
 
 const init = async () => {

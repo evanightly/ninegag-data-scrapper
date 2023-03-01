@@ -27,7 +27,8 @@ body.darkMode #post-header {
   color: var(--lightColor);
 }
 
-body.darkMode #tag-modal .modal-content {
+body.darkMode #tag-modal .modal-content,
+body.darkMode #note-modal .modal-content {
   background-color: var(--darkColor-2);
   color: var(--lightColor);
 }

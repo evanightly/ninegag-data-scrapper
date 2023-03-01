@@ -7,6 +7,7 @@ import NavDropdown from 'react-bootstrap/NavDropdown';
 import { StateContext, TagContext } from '../pages/Posts';
 import axios from 'axios';
 import config from '../config'
+import PostNote from './PostNote'
 
 export default function PostNavbar() {
     const [showModal, setShowModal] = useState(false)
@@ -20,6 +21,7 @@ export default function PostNavbar() {
                         <SearchForm />
                     </Nav>
                     <Nav>
+                        <PostNote />
                         <TagsModal />
                         <PostLimitSlider />
                         <PostSettings />
