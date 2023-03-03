@@ -33,6 +33,13 @@ body.darkMode #note-modal .modal-content {
   color: var(--lightColor);
 }
 
+body.darkMode #note-modal .modal-content .quill span {
+  color: var(--lightColor);
+}
+body.darkMode #note-modal .modal-content .quill svg {
+  filter: invert(95%) sepia(2%) saturate(196%) hue-rotate(272deg) brightness(119%) contrast(100%);;
+}
+
 body.darkMode #tag-modal .btn-outline-primary {
   border-color: var(--lightColor);
   color: var(--lightColor);
