@@ -37,7 +37,7 @@ export default function Note() {
                 <Modal.Body>
                     <ReactQuill theme="snow" value={note} onChange={setNote} />
                     <Col className="d-flex justify-content-end pt-3">
-                        <Button type="submit" variant="outline-success" onClick={handleSubmit}>Submit</Button>
+                        <Button type="submit" variant="success" onClick={handleSubmit}>Submit</Button>
                     </Col>
                 </Modal.Body>
             </Modal>

@@ -32,9 +32,7 @@ This programs may have bugs so.. I'll try my best to fix them
 ### Future Updates
 - Server
   - Delete deleted post
-
+  - Skip deleted post when scrapping
 - Client
-  - Update tags in navigation when there is new tag in specific post
   - Cross get data server - client when scraping (sending scrap progress to client side)
-  - Fix rerender when new tag modal opened
-  - Resync tags when adding/removing custom tags
+    - Bug: modal auto close when sync button clicked, possible bug occurred when scrapProgress data is not updated
