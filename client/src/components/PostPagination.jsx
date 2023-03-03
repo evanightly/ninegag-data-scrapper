@@ -12,6 +12,7 @@ export default function PostPagination() {
     const handlePrevPage = () => handlePage(pageIndex - 1)
     const handleLastPage = () => handlePage(postTotal - 1)
 
+
     const PrevPagination = () => {
         const elements = []
         for (let index = displayLimit; index >= 1; index--) {
@@ -46,11 +47,12 @@ export default function PostPagination() {
     }
 
     const ShowNextPagination = () => {
+        const lastPageHandler = () => handlePage(postTotal - 1)
         if (currentPage < postTotal) {
             return (
                 <>
                     <Pagination.Ellipsis />
-                    <Pagination.Item>{postTotal}</Pagination.Item>
+                    <Pagination.Item onClick={lastPageHandler}>{postTotal}</Pagination.Item>
                 </>
             )
         }
@@ -69,12 +71,19 @@ export default function PostPagination() {
     }
 
     const MainPostPagination = () => {
+        const firstPage = currentPage <= displayLimit ? currentPage : 1
+        const firstPageHandler = () => handlePage(firstPage - 1)
+        const isActive = currentPage <= displayLimit
         if (postSearch.trim().length <= 0) {
             return (
                 <Pagination id="post-pagination" className="m-0">
                     <Pagination.First onClick={handleFirstPage} />
                     <ShowPrev />
-                    <Pagination.Item active={currentPage <= displayLimit}>{currentPage <= displayLimit ? currentPage : 1}</Pagination.Item>
+                    <Pagination.Item
+                        active={isActive}
+                        onClick={firstPageHandler}>
+                        {firstPage}
+                    </Pagination.Item>
                     <ShowPrevPagination />
                     <ShowNextPagination />
                     <ShowNext />

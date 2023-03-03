@@ -1,7 +1,7 @@
 import { Stack } from "react-bootstrap"
 import Masonry, { ResponsiveMasonry } from 'react-responsive-masonry'
 import Post from "../components/Post"
-import { createContext, useCallback, useEffect, useMemo,  useState, useTransition } from "react"
+import { createContext, memo, useCallback, useEffect, useMemo,  useState, useTransition } from "react"
 import config from '../config'
 import axios from 'axios'
 import PostPagination from "../components/PostPagination"
@@ -106,7 +106,7 @@ export default function Posts() {
     }, [state.darkMode])
 
 
-    const MemoPosts = useMemo(() => {
+    const MemoPosts = memo(() => {
         const masonryBreakpoints = {
             // Breakpoint: row count
             360: 1,
@@ -132,8 +132,8 @@ export default function Posts() {
         )
     }, [isPending, state.posts])
 
-    const MemoPostNavbar = useMemo(() => <PostNavbar />, [])
-    const MemoPostPagination = useMemo(() => <PostPagination />, [])
+    const MemoPostNavbar = memo(() => <PostNavbar />, [])
+    const MemoPostPagination = memo(() => <PostPagination />, [])
 
     const Header = () => {
         let headerText = state.postSearch.length > 0
@@ -148,11 +148,11 @@ export default function Posts() {
         <StateContext.Provider value={{ state, setState, initialize }}>
             <TagContext.Provider value={{ tag, customTags, loadTags }}>
                 <Stack gap={4} className="p-5">
-                    {MemoPostNavbar}
+                    <MemoPostNavbar />
                     <Header />
-                    {MemoPostPagination}
-                    {MemoPosts}
-                    {MemoPostPagination}
+                    <MemoPostPagination />
+                    <MemoPosts />
+                    <MemoPostPagination />
                     <PostFooter />
                 </Stack>
             </TagContext.Provider>
