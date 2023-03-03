@@ -162,19 +162,19 @@ function PostSettings() {
 
     const handleSync = async () => {
         const { SERVER_ORIGIN } = config
-        console.log("Syncing")
-        axios.get(SERVER_ORIGIN + '/post/sync')
         setShowSyncProgress(true)
+        await axios.get(SERVER_ORIGIN + '/scrap-progress/clear')
 
-        setInterval(async () => {
+        const showScrapProgress = setInterval(async () => {
             const { data: { maxPost, scrapped } } = await axios.get(SERVER_ORIGIN + '/scrap-progress')
             setScrap({ scrapped, totalUnscrapped: maxPost })
-            if (maxPost > 1 && maxPost === scrapped) {
-                setShowSyncProgress(false)
-                setState({ postLimit: 10, pageIndex: 0 })
-                console.log("Complete")
-            }
         }, 3000)
+
+        axios.get(SERVER_ORIGIN + '/post/sync').then(() => {
+            setShowSyncProgress(false)
+            setState({ postLimit: 10, pageIndex: 0 })
+            clearInterval(showScrapProgress)
+        })
     }
 
     const memoSyncProgressModal = useMemo(() => {
