@@ -15,7 +15,7 @@ const performGetUserData = async (browser) => {
         await page.close()
         return localStorage
     } catch (error) {
-        console.log("Your ip might be blocked by cloudflare at the moment, please try again later")
+        console.log("Your ip might be blocked by cloudflare at the moment, please try again later", error)
     }
 }
 

@@ -35,7 +35,6 @@ router.get('/sync', async (req, res) => {
         const [savedPost, votedPost] = await performSyncUserData(browser);
         const savedPostChunk = spliceIntoChunks(savedPost, 10)
         const votedPostChunk = spliceIntoChunks(votedPost, 10)
-
         const savedPostNumber = 1
         const votedPostNumber = 2
         savedPostChunk.length > 0 && await performGetPost(browser, savedPostChunk, savedPostNumber)
