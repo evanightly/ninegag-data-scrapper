@@ -22,7 +22,7 @@ Used to get your 9gag saved and voted data, then display it into your own websit
 
 ### Scrapping Data
 1. After running server and its client, go to http://localhost:1122/post/sync
-2. Wait for the scraping progress, you can check its progress through server terminal
+2. Wait for the scraping progress, you can check its progress through server terminal!
 3. After complete you can refresh your client(website or so to say)
 4. Congratulations, your system is ready to use!
 

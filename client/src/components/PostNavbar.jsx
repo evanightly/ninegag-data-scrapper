@@ -167,7 +167,7 @@ function PostSettings() {
 
         const showScrapProgress = setInterval(async () => {
             const { data: { maxPost, scrapped } } = await axios.get(SERVER_ORIGIN + '/scrap-progress')
-            setScrap({ scrapped, totalUnscrapped: maxPost })
+            setScrap({ scrapped, totalUnscrapped: maxPost || 0 })
         }, 3000)
 
         axios.get(SERVER_ORIGIN + '/post/sync').then(() => {
