@@ -19,6 +19,10 @@ const Post = model('Post', {
         username: String
     },
     tags: [{ type: Schema.Types.ObjectId, ref: 'Tag' }],
+    archived: {
+        type: Boolean,
+        default: false
+    }
 })
 
 module.exports = Post

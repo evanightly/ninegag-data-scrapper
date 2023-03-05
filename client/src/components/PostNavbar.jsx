@@ -152,6 +152,7 @@ function PostLimitSlider() {
 
 function PostSettings() {
     const { state, setState } = useContext(StateContext)
+    const { SERVER_ORIGIN } = config
     const handlePostType = (type) => setState({ postType: type })
     const [showSyncProgress, setShowSyncProgress] = useState(false)
 
@@ -161,7 +162,6 @@ function PostSettings() {
     })
 
     const handleSync = async () => {
-        const { SERVER_ORIGIN } = config
         setShowSyncProgress(true)
         await axios.get(SERVER_ORIGIN + '/scrap-progress/clear')
 
@@ -175,6 +175,13 @@ function PostSettings() {
             setState({ postLimit: 10, pageIndex: 0 })
             clearInterval(showScrapProgress)
         })
+    }
+
+    const getVotedPosts = () => handlePostType(1)
+    const getSavedPosts = () => handlePostType(2)
+    const getArchivedPosts = async () => {
+        const { data: posts } = await axios(SERVER_ORIGIN + '/post/archive')
+        setState({ posts, postSearch: "Archived Posts" })
     }
 
     const memoSyncProgressModal = useMemo(() => {
@@ -201,8 +208,9 @@ function PostSettings() {
     return (
         <NavDropdown title={<i className="bi bi-gear-fill"></i>} align="end">
             <DarkMode />
-            <NavDropdown.Item onClick={() => handlePostType(1)}><i className="bi bi-bookmark-fill text-primary"></i> Saved</NavDropdown.Item>
-            <NavDropdown.Item onClick={() => handlePostType(2)}><i className="bi bi-heart-fill text-danger"></i> Voted</NavDropdown.Item>
+            <NavDropdown.Item onClick={getSavedPosts}><i className="bi bi-bookmark-fill text-primary"></i> Saved</NavDropdown.Item>
+            <NavDropdown.Item onClick={getVotedPosts}><i className="bi bi-heart-fill text-danger"></i> Voted</NavDropdown.Item>
+            <NavDropdown.Item onClick={getArchivedPosts}><i className="bi bi-archive-fill text-secondary"></i> Archived</NavDropdown.Item>
             <NavDropdown.Divider />
             <NavDropdown.Item onClick={handleSync}>
                 <i className="bi bi-arrow-repeat text-warning"></i> Sync

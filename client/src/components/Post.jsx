@@ -1,14 +1,14 @@
-import { useContext, useRef, useState } from "react";
-import { Badge, Button, Card, Modal, Form, Container, Row, Col, Image } from "react-bootstrap";
+import { forwardRef, useContext, useRef, useState } from "react";
+import { Badge, Button, Card, Modal, Form, Container, Row, Col, Image, Dropdown } from "react-bootstrap";
 import config from '../config'
 import titleCase from "../helper/titleCase";
 import axios from "axios";
-import { TagContext } from "../pages/Posts";
+import { StateContext, TagContext } from "../pages/Posts";
 
 const { SERVER_ORIGIN, DEFAULT_MEDIA_VOLUME } = config
 export default function Post({ post }) {
     const [state] = useState(post)
-    const { id, title, author, dateCreated } = state
+    const { _id, id, title, author, dateCreated, archived } = state
 
     return (
         <Card style={{ width: '18rem' }} id="post-card">
@@ -24,10 +24,75 @@ export default function Post({ post }) {
                     </a>
                 </Card.Title>
                 <Tags />
+                <Options />
             </Card.Body>
             <Footer />
         </Card>
     )
+
+    function Options() {
+        const { state, setState } = useContext(StateContext)
+        const darkMode = state.darkMode ? "dark" : "white"
+
+        const CustomToggle = forwardRef(({ children, onClick }, ref) => (
+            <a
+                href="/"
+                ref={ref}
+                onClick={(e) => {
+                    e.preventDefault();
+                    onClick(e);
+                }}
+            >
+                {children}
+            </a>
+        ));
+
+        const CustomMenu = forwardRef(
+            ({ children, style, className, 'aria-labelledby': labeledBy }, ref) => {
+                return (
+                    <div
+                        ref={ref}
+                        style={style}
+                        className={className}
+                        aria-labelledby={labeledBy}
+                    >
+                        <ul className="list-unstyled m-0">
+                            {children}
+                        </ul>
+                    </div>
+                );
+            }
+        );
+
+        const handleArchive = async () => {
+            let setArchived = archived ? false : true
+            await axios.post(SERVER_ORIGIN + '/post/archive/', { _id, archived: setArchived })
+            let { posts } = state
+            setState({ posts: posts.filter(post => post.id !== id) })
+        }
+
+
+        return (
+            <Dropdown>
+                <Dropdown.Toggle as={CustomToggle} variant={darkMode} id="dropdown-basic">
+                    <Badge
+                        role="button"
+                        className="me-1"
+                        pill>
+                        <i className="bi bi-three-dots"></i>
+                    </Badge>
+                </Dropdown.Toggle>
+                <Dropdown.Menu as={CustomMenu} variant={darkMode}>
+                    <Dropdown.Item onClick={handleArchive}>
+                        {archived ? "Remove archive" : "Archive"}
+                    </Dropdown.Item>
+                    <Dropdown.Item disabled>
+                        Delete (Coming Soon)
+                    </Dropdown.Item>
+                </Dropdown.Menu>
+            </Dropdown>
+        )
+    }
 
     function Media() {
         const mediaType = state.mediaType === "Animated" ? "video" : "image"
@@ -96,12 +161,13 @@ export default function Post({ post }) {
             handleClose()
         }
 
-        const handleFastAdd = async e => {
-            await setNewTag(e.target.innerText)
+        const handleFastAdd = e => {
+            setNewTag(e.target.innerText)
             submitRef.current.click()
             setNewTag("")
             setShow(false)
         }
+
         return (
             <>
                 <Badge

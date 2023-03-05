@@ -32,7 +32,6 @@ This programs may have bugs so.. I'll try my best to fix them
 ### Future Updates
 - Server
   - Delete deleted post
-  - Skip deleted post when scrapping
 - Client
   - Cross get data server - client when scraping (sending scrap progress to client side)
     - Bug: modal auto close when sync button clicked, possible bug occurred when scrapProgress data is not updated

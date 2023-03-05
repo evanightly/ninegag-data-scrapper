@@ -65,11 +65,28 @@ router.get('/total/:postType', async (req, res) => {
     res.json(posts)
 })
 
+router.get('/archive', async (req, res) => {
+    const archivedPost = await Post
+        .find({ archived: true })
+        .populate('tags', ['title', 'tagType'])
+        .sort({ dateCreated: 'desc' })
+    res.json(archivedPost)
+})
+
+router.post('/archive', async (req, res) => {
+    const { _id, archived } = req.body
+    const archivedPost = await Post.findByIdAndUpdate(_id, {
+        archived
+    }, { new: true })
+    res.json(archivedPost)
+})
+
 router.get('/:postType/:skip/:limit', async (req, res) => {
     let { postType, skip, limit } = req.params
     if (skip < 0) skip = 0
     const posts = await Post
         .find({ postType })
+        .where({ $or: [{ archived: { $exists: false } }, { archived: false }] })
         .populate('tags', ['title', 'tagType'])
         .sort({ dateCreated: 'desc' })
         .skip(skip)
