@@ -177,8 +177,8 @@ function PostSettings() {
         })
     }
 
-    const getVotedPosts = () => handlePostType(1)
-    const getSavedPosts = () => handlePostType(2)
+    const getVotedPosts = () => handlePostType(2)
+    const getSavedPosts = () => handlePostType(1)
     const getArchivedPosts = async () => {
         const { data: posts } = await axios(SERVER_ORIGIN + '/post/archive')
         setState({ posts, postSearch: "Archived Posts" })
