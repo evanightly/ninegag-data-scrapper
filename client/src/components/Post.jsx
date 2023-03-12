@@ -161,8 +161,8 @@ export default function Post({ post }) {
             handleClose()
         }
 
-        const handleFastAdd = e => {
-            setNewTag(e.target.innerText)
+        const handleFastAdd = async e => {
+            await setNewTag(e.target.innerText)
             submitRef.current.click()
             setNewTag("")
             setShow(false)

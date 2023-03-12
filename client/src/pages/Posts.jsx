@@ -106,6 +106,7 @@ export default function Posts() {
     useEffect(() => {
         loadUserSettings()
         loadDarkMode()
+        loadTags()
     }, [darkMode])
 
     useEffect(() => {
