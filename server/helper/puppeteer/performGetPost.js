@@ -3,7 +3,7 @@ const performGetPostData = require('./performGetPostData')
 const Post = require('../../model/Post')
 const RemovedPost = require('../../model/RemovedPost')
 const Tag = require('../../model/Tag')
-const download = require('download-file')
+const Downloader = require('nodejs-file-downloader')
 const ScrapProgress = require('../../model/ScrapProgress')
 
 const performGetPost = async (browser, postChunks, type = 1) => {
@@ -17,31 +17,38 @@ const performGetPost = async (browser, postChunks, type = 1) => {
         // Set pause time for each scrap, so cloudflare protection wont be triggered
         await new Promise(resolve => setTimeout(resolve, SYSTEM.GET_DATA_TIMEOUT))
 
-        // Show scrap progresses
+        // Show scrap progress
         console.log(`${currentIndex} of ${totalPosts} data has been scrapped`)
 
         for (const post of posts) {
             console.log(`Next queue : ${post}`)
             const postData = await performGetPostData(browser, post, type)
 
-            let url = ""
-            const options = {}
-
             // Perform download the media file
             if (postData.hasOwnProperty('mediaSources')) {
-                if (postData.mediaType === "Animated") {
-                    url = postData.mediaSources.image460sv.url
-                    options.directory = "./public/video/"
-                    options.filename = `${postData.id}.mp4`
-                } else {
-                    url = postData.mediaSources.image700.url
-                    options.directory = "./public/image/"
-                    options.filename = `${postData.id}.jpg`
+                try {
+                    if (postData.mediaType === "Animated") {
+                        const videoDownloader = new Downloader({
+                            url: postData.mediaSources.image460sv.url,
+                            directory: "./public/video",
+                            fileName: `${postData.id}.mp4`,
+                            cloneFiles: false
+                        })
+
+                        await videoDownloader.download()
+                    }
+
+                    const imageDownloader = new Downloader({
+                        url: postData.mediaSources.image700.url,
+                        directory: "./public/image",
+                        fileName: `${postData.id}.jpg`,
+                        cloneFiles: false
+                    })
+
+                    await imageDownloader.download()
+                } catch (error) {
+                    console.log("Download failed", error);
                 }
-                download(url, options, err => {
-                    if (err) throw err
-                    console.log('File Downloaded')
-                })
             }
 
             if (postData.tags) {

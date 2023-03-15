@@ -32,6 +32,11 @@ This programs may have bugs so.. I'll try my best to fix them
 ### Future Updates
 - Server
   - Delete deleted post
+  - Add downvoted post
+  - Refactor routing
 - Client
-  - Cross get data server - client when scraping (sending scrap progress to client side)
-    - Bug: modal auto close when sync button clicked, possible bug occurred when scrapProgress data is not updated
+  - Sort based on voted date
+  - Pause on scroll
+- Both Stack
+  - Patch mediasource download if not exist
+

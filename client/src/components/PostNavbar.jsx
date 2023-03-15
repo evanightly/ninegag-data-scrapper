@@ -170,7 +170,7 @@ function PostSettings() {
             setScrap({ scrapped, totalUnscrapped: maxPost || 0 })
         }, 3000)
 
-        axios.get(SERVER_ORIGIN + '/post/sync').then(() => {
+        axios.get(SERVER_ORIGIN + '/sync').then(() => {
             setShowSyncProgress(false)
             setState({ postLimit: 10, pageIndex: 0 })
             clearInterval(showScrapProgress)
@@ -180,7 +180,7 @@ function PostSettings() {
     const getVotedPosts = () => handlePostType(2)
     const getSavedPosts = () => handlePostType(1)
     const getArchivedPosts = async () => {
-        const { data: posts } = await axios(SERVER_ORIGIN + '/post/archive')
+        const { data: posts } = await axios(SERVER_ORIGIN + '/archive')
         setState({ posts, postSearch: "Archived Posts" })
     }
 
